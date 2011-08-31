@@ -20,6 +20,11 @@
 <bundles>
 	<!-- Clerezza storage and sparql infrastructure -->
 	<startLevel level="16">
+		<bundle><!--  needed this newer version by org.apache.stanbol.commons.solr -->
+			<groupId>org.apache.sling</groupId>
+			<artifactId>org.apache.sling.installer.core</artifactId>
+			<version>3.2.0</version>
+		</bundle>
 		<!-- deps in earlier stanbol runlevels -->
 		<bundle>
 			<groupId>org.apache.stanbol</groupId>

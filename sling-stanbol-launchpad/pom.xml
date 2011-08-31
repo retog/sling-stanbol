@@ -26,7 +26,7 @@
 			<plugin>
 				<groupId>org.apache.sling</groupId>
 				<artifactId>maven-launchpad-plugin</artifactId>
-				<version>2.0.11-SNAPSHOT</version>
+				<version>2.0.10</version>
 				<executions>
 					<execution>
 						<id>prepare-package</id>
@@ -48,6 +48,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.2</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -66,7 +67,7 @@
 			<!-- maven-launchpad-plugin builds on the launchpad.base app -->
 			<groupId>org.apache.sling</groupId>
 			<artifactId>org.apache.sling.launchpad.base</artifactId>
-			<version>2.3.1-SNAPSHOT</version>
+			<version>2.3.0</version>
 			<classifier>app</classifier>
 		</dependency>
 	</dependencies>
