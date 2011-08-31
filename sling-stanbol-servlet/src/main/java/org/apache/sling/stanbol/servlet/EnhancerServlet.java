@@ -16,13 +16,20 @@
  */
 package org.apache.sling.stanbol.servlet;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
+
 import javax.servlet.ServletException;
+
 import org.apache.clerezza.rdf.core.MGraph;
+import org.apache.clerezza.rdf.core.Resource;
+import org.apache.clerezza.rdf.core.UriRef;
+import org.apache.clerezza.rdf.core.serializedform.Serializer;
+import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
+import org.apache.clerezza.rdf.utils.GraphNode;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
@@ -35,10 +42,6 @@ import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EngineException;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementJobManager;
 import org.apache.stanbol.enhancer.servicesapi.helper.InMemoryContentItem;
-import org.apache.clerezza.rdf.core.MGraph;
-import org.apache.clerezza.rdf.core.UriRef;
-import org.apache.clerezza.rdf.core.serializedform.Serializer;
-import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
 
 /** Servlet that registers itself for specific paths */
 @Component(immediate=true, metatype=false)
@@ -58,21 +61,69 @@ public class EnhancerServlet extends SlingSafeMethodsServlet {
 
 	@Reference
 	Serializer serializer;
+	
 	@Override
 	protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
-		PrintWriter out =  response.getWriter();
+		response.setContentType("text/html");
+		final PrintWriter out =  response.getWriter();
 		out.println("enjoy with "+ejm.getActiveEngines().size());
 		ejm.getActiveEngines().size();
-		/*OutputStream out = response.getOutputStream();
-		UriRef contentUri = new UriRef("http://example.org/");
-		ContentItem c = new InMemoryContentItem(contentUri.getUnicodeString(), "hello".getBytes(),"text/plain");
-		try {
-			ejm.enhanceContent(c);
-		} catch (EngineException ex) {
-			throw new ServletException("Exception enhancing content", ex);
+		final String content = request.getParameter("content");
+		out.println("<form action=\"enhancer\">");
+		out.println("<textarea name=\"content\">");
+		out.println(content == null? "" : content);
+		out.println("</textarea>");
+		out.println("<input type=\"submit\" />");
+		if (content != null) {
+			out.println("<br/>");
+			UriRef contentUri = new UriRef("http://example.org/");
+			ContentItem c = new InMemoryContentItem(contentUri.getUnicodeString(), content.getBytes() ,"text/plain");
+			try {
+				ejm.enhanceContent(c);
+			} catch (EngineException ex) {
+				throw new ServletException("Exception enhancing content", ex);
+			}
+			MGraph metadata = c.getMetadata();
+			out.println("metadata size: "+metadata.size()+"<br/>");
+			printEntities(out, contentUri, metadata);
+			out.println("<textarea>");
+			out.println(serializeToString(metadata));
+			out.println("</textarea>");
 		}
-		MGraph metadata = c.getMetadata();
-		serializer.serialize(out, metadata, SupportedFormat.RDF_XML);*/
+		out.println("</form>");	
+	}
+	
+	
+	private void printEntities(PrintWriter out, Resource resource, MGraph metadata) {
+		boolean first = true;
+		GraphNode node = new GraphNode(resource, metadata);
+		Iterator<GraphNode> extractedAnnotations = node.getSubjectNodes(org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_EXTRACTED_FROM);
+		while (extractedAnnotations.hasNext()) {
+			GraphNode extractedAnnotation = extractedAnnotations.next();
+			Iterator<Resource> entityTypes = extractedAnnotation.getObjects(org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_ENTITY_TYPE);
+			while (entityTypes.hasNext()) {
+				Resource entityType = entityTypes.next();
+				if (entityType instanceof UriRef) {
+					if (first) {
+						out.println("<h3>Entities:</h3>");
+						first = false;
+					}
+					out.println(((UriRef)entityType).getUnicodeString()+": ");
+					out.println(extractedAnnotation.getLiterals(org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_ENTITY_LABEL).next().getLexicalForm()+"<br/>");
+				}
+			}
+		}
+	}
+
+
+	private String serializeToString(MGraph metadata) {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		serializer.serialize(out, metadata, SupportedFormat.RDF_XML);
+		try {
+			return new String(out.toByteArray(), "utf-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 
