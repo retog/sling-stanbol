@@ -66,14 +66,13 @@ public class EnhancerServlet extends SlingSafeMethodsServlet {
 	protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html");
 		final PrintWriter out =  response.getWriter();
-		out.println("enjoy with "+ejm.getActiveEngines().size());
-		ejm.getActiveEngines().size();
+		out.println("Enhancer running with "+ejm.getActiveEngines().size()+" active engines.");
 		final String content = request.getParameter("content");
 		out.println("<form action=\"enhancer\">");
 		out.println("<textarea name=\"content\">");
 		out.println(content == null? "" : content);
-		out.println("</textarea>");
-		out.println("<input type=\"submit\" />");
+		out.println("</textarea><br/>");
+		out.println("<input type=\"submit\" value=\"Enhance\"/>");
 		if (content != null) {
 			out.println("<br/>");
 			UriRef contentUri = new UriRef("http://example.org/");
