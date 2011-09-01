@@ -14,7 +14,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.wymiwyg.sling-stanbol</groupId>
-	<artifactId>sling-stanbol-launchpad</artifactId>
+	<artifactId>sling-stanbol-launcher</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0-SNAPSHOT</version>
 	<name>Sling-Stanbol Launcher</name>
