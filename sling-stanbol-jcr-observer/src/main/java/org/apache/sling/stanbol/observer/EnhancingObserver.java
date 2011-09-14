@@ -16,12 +16,6 @@
  */
 package org.apache.sling.stanbol.observer;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
-import java.util.logging.Level;
 import javax.jcr.Node;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.Repository;
@@ -33,20 +27,14 @@ import javax.jcr.observation.EventIterator;
 import javax.jcr.observation.EventListener;
 import javax.jcr.observation.ObservationManager;
 
-import javax.servlet.ServletException;
-
 import org.apache.clerezza.rdf.core.MGraph;
-import org.apache.clerezza.rdf.core.Resource;
 import org.apache.clerezza.rdf.core.UriRef;
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
-import org.apache.clerezza.rdf.utils.GraphNode;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
-import org.apache.sling.api.SlingHttpServletRequest;
-import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.jcr.api.SlingRepository;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EngineException;
@@ -132,6 +120,7 @@ public class EnhancingObserver implements EventListener {
 			System.out.println("Enhancer running with " + ejm.getActiveEngines().size() + " active engines.");
 			String mimeType = getMimeType(node);
 			UriRef contentUri = new UriRef("http://example.org/");
+			System.out.println("Mime-type: "+mimeType);
 			ContentItem c = new InMemoryContentItem(contentUri.getUnicodeString(), content.getBytes(), mimeType);
 			try {
 				ejm.enhanceContent(c);
@@ -147,12 +136,10 @@ public class EnhancingObserver implements EventListener {
 	}
 
 	private String getMimeType(Node n) throws ValueFormatException, RepositoryException {
-		String result = null;
 		try {
-			final String mimeType = n.getProperty("jcr:mimeType").getString();
+			return n.getProperty("jcr:content/jcr:mimeType").getString();
 		} catch (PathNotFoundException ex) {
 			return "application/octet-stream";
 		}
-		return result;
 	}
 }
