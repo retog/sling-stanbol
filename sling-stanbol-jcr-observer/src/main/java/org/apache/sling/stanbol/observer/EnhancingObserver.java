@@ -29,6 +29,9 @@ import javax.jcr.observation.ObservationManager;
 
 import org.apache.clerezza.rdf.core.MGraph;
 import org.apache.clerezza.rdf.core.UriRef;
+import org.apache.clerezza.rdf.core.access.LockableMGraph;
+import org.apache.clerezza.rdf.core.access.NoSuchEntityException;
+import org.apache.clerezza.rdf.core.access.TcManager;
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
 import org.apache.felix.scr.annotations.Component;
@@ -54,17 +57,28 @@ enhancements with Stanbol */
 @SuppressWarnings("serial")
 public class EnhancingObserver implements EventListener {
 
-	private Session session;
-	private ObservationManager observationManager;
 	@Reference
 	private SlingRepository repository;
+	
 	@Reference
 	EnhancementJobManager ejm;
+	
 	@Reference
 	Serializer serializer;
+	
+	@Reference
+	TcManager tcManager;
+	
 	@Property(value = "/")
 	private static final String CONTENT_PATH_PROPERTY = "content.path";
+	
 	private static final Logger log = LoggerFactory.getLogger(EnhancingObserver.class);
+	
+	private Session session;
+	
+	private ObservationManager observationManager;
+	
+	private static final UriRef enhancementMGraphUri = new UriRef("urn:x-localinstance:/enhancement.graph");
 
 	protected void activate(ComponentContext context) throws Exception {
 		//supportedMimeTypes.put("image/jpeg", ".jpg");
@@ -119,7 +133,7 @@ public class EnhancingObserver implements EventListener {
 			System.out.println("content: " + content);
 			System.out.println("Enhancer running with " + ejm.getActiveEngines().size() + " active engines.");
 			String mimeType = getMimeType(node);
-			UriRef contentUri = new UriRef("http://example.org/");
+			UriRef contentUri = getUri(node);
 			System.out.println("Mime-type: "+mimeType);
 			ContentItem c = new InMemoryContentItem(contentUri.getUnicodeString(), content.getBytes(), mimeType);
 			try {
@@ -129,9 +143,30 @@ public class EnhancingObserver implements EventListener {
 			}
 			MGraph metadata = c.getMetadata();
 			System.out.println("metadata size: " + metadata.size());
+			MGraph enhancementMGraph = getEnhancementMGraph();
+			enhancementMGraph.addAll(metadata);
+			System.out.println("accumulated metadata size: " + enhancementMGraph.size());
 			serializer.serialize(System.out, metadata, SupportedFormat.RDF_XML);
 		} catch (RepositoryException ex) {
 			throw new RuntimeException(ex);
+		}
+	}
+	
+	private UriRef getUri(Node node) throws RepositoryException {
+		return new UriRef("urn:x-localinstance:"+node.getPath());
+	}
+
+	private LockableMGraph getEnhancementMGraph() {
+		try {
+			return tcManager.getMGraph(enhancementMGraphUri);
+		} catch (NoSuchEntityException e) {
+			synchronized (this) {
+				try {
+					return tcManager.getMGraph(enhancementMGraphUri);
+				} catch (NoSuchEntityException e1) {
+					return tcManager.createMGraph(enhancementMGraphUri);
+				}
+			}
 		}
 	}
 
