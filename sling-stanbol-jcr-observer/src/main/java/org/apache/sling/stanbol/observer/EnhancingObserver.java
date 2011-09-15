@@ -37,7 +37,6 @@ import org.apache.clerezza.rdf.core.access.LockableMGraph;
 import org.apache.clerezza.rdf.core.access.NoSuchEntityException;
 import org.apache.clerezza.rdf.core.access.TcManager;
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
-import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
 import org.apache.clerezza.rdf.utils.GraphNode;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
@@ -60,7 +59,7 @@ enhancements with Stanbol */
 	@Property(name = "service.vendor", value = "The Apache Software Foundation")
 })
 @SuppressWarnings("serial")
-public class EnhancingObserver implements EventListener {
+public class EnhancingObserver implements EventListener, Runnable {
 
 	@Reference
 	private SlingRepository repository;
@@ -82,8 +81,13 @@ public class EnhancingObserver implements EventListener {
 	private Session session;
 	
 	private ObservationManager observationManager;
+
+	private Set<Node> pendingNodes = new HashSet<Node>();
+
 	
 	private static final UriRef enhancementMGraphUri = new UriRef("urn:x-localinstance:/enhancement.graph");
+	
+	private Thread thread;
 
 	protected void activate(ComponentContext context) throws Exception {
 		//supportedMimeTypes.put("image/jpeg", ".jpg");
@@ -101,6 +105,8 @@ public class EnhancingObserver implements EventListener {
 		} else {
 			log.warn("Obervation is not supported");
 		}
+		thread = new Thread(this);
+		thread.start();
 	}
 
 	protected void deactivate(ComponentContext componentContext) throws RepositoryException {
@@ -111,6 +117,7 @@ public class EnhancingObserver implements EventListener {
 			session.logout();
 			session = null;
 		}
+		thread.interrupt();
 	}
 
 	public void onEvent(EventIterator ei) {
@@ -122,12 +129,42 @@ public class EnhancingObserver implements EventListener {
 					String propertyPath = event.getPath();
 					Node addedNode = session.getRootNode().getNode(
 							propertyPath.substring(1, propertyPath.indexOf("/jcr:content")));
-					processNode(addedNode);
+					synchronized(pendingNodes) {
+						pendingNodes.add(addedNode);
+					}
+					synchronized(this) {
+						notifyAll();
+					}
+					
 				}
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
 		}
+	}
+	
+	
+
+	public void run() {
+		while (!Thread.currentThread().isInterrupted()) {
+			synchronized(this) {
+				try {
+					wait();
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					thread.interrupt();
+				}
+			}
+			Set<Node> processingNode = new HashSet<Node>();
+			synchronized(pendingNodes) {
+				processingNode.addAll(pendingNodes);
+				processingNode.clear();
+			}
+			for (Node node : processingNode) {
+				processNode(node);
+			}
+		}
+		System.out.println("thread finished"+this+", "+thread);
 	}
 
 	private void processNode(Node node) {
