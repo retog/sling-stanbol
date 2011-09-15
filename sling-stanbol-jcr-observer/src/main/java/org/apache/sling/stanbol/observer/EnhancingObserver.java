@@ -16,6 +16,10 @@
  */
 package org.apache.sling.stanbol.observer;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import javax.jcr.Node;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.Repository;
@@ -34,6 +38,7 @@ import org.apache.clerezza.rdf.core.access.NoSuchEntityException;
 import org.apache.clerezza.rdf.core.access.TcManager;
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
+import org.apache.clerezza.rdf.utils.GraphNode;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
@@ -111,7 +116,6 @@ public class EnhancingObserver implements EventListener {
 	public void onEvent(EventIterator ei) {
 		while (ei.hasNext()) {
 			Event event = ei.nextEvent();
-			System.out.println("Got Event: " + event);
 			try {
 				if (event.getPath().endsWith("jcr:data")) {
 					System.out.println("Processing Data");
@@ -142,11 +146,22 @@ public class EnhancingObserver implements EventListener {
 				throw new RuntimeException("Exception enhancing content", ex);
 			}
 			MGraph metadata = c.getMetadata();
-			System.out.println("metadata size: " + metadata.size());
 			MGraph enhancementMGraph = getEnhancementMGraph();
+			GraphNode contentGN = new GraphNode(contentUri, enhancementMGraph);
+			Iterator<GraphNode> enhancementsIter = contentGN.getSubjectNodes(org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_EXTRACTED_FROM);
+			//adding to set to avoid concurrent modification
+			Set<GraphNode> enhancements = new HashSet<GraphNode>();
+			while (enhancementsIter.hasNext()) {
+				GraphNode enhancement = enhancementsIter.next();
+				enhancements.add(enhancement);
+			}
+			for (GraphNode enhancement : enhancements) {
+				enhancement.deleteNodeContext();
+			}
+			contentGN.deleteNodeContext();
 			enhancementMGraph.addAll(metadata);
-			System.out.println("accumulated metadata size: " + enhancementMGraph.size());
-			serializer.serialize(System.out, metadata, SupportedFormat.RDF_XML);
+			log.info("accumulated metadata size: {}.", enhancementMGraph.size());
+			//serializer.serialize(System.out, metadata, SupportedFormat.RDF_XML);
 		} catch (RepositoryException ex) {
 			throw new RuntimeException(ex);
 		}

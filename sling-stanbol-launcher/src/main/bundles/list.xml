@@ -346,6 +346,11 @@
 		</bundle>
 		<bundle>
 			<groupId>org.wymiwyg.sling-stanbol</groupId>
+			<artifactId>sling-stanbol-jcr-observer</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</bundle>
+		<bundle>
+			<groupId>org.wymiwyg.sling-stanbol</groupId>
 			<artifactId>sling-stanbol-fragment</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</bundle>
