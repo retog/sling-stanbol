@@ -33,8 +33,6 @@ import javax.jcr.observation.ObservationManager;
 
 import org.apache.clerezza.rdf.core.MGraph;
 import org.apache.clerezza.rdf.core.UriRef;
-import org.apache.clerezza.rdf.core.access.LockableMGraph;
-import org.apache.clerezza.rdf.core.access.NoSuchEntityException;
 import org.apache.clerezza.rdf.core.access.TcManager;
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.clerezza.rdf.utils.GraphNode;
@@ -43,6 +41,7 @@ import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.sling.jcr.api.SlingRepository;
+import org.apache.sling.stanbol.commons.Utils;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EngineException;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementJobManager;
@@ -84,8 +83,7 @@ public class EnhancingObserver implements EventListener, Runnable {
 
 	private Set<Node> pendingNodes = new HashSet<Node>();
 
-	
-	private static final UriRef enhancementMGraphUri = new UriRef("urn:x-localinstance:/enhancement.graph");
+
 	
 	private Thread thread;
 
@@ -125,7 +123,6 @@ public class EnhancingObserver implements EventListener, Runnable {
 			Event event = ei.nextEvent();
 			try {
 				if (event.getPath().endsWith("jcr:data")) {
-					System.out.println("Processing Data");
 					String propertyPath = event.getPath();
 					Node addedNode = session.getRootNode().getNode(
 							propertyPath.substring(1, propertyPath.indexOf("/jcr:content")));
@@ -158,24 +155,19 @@ public class EnhancingObserver implements EventListener, Runnable {
 			Set<Node> processingNode = new HashSet<Node>();
 			synchronized(pendingNodes) {
 				processingNode.addAll(pendingNodes);
-				processingNode.clear();
+				pendingNodes.clear();
 			}
 			for (Node node : processingNode) {
 				processNode(node);
 			}
 		}
-		System.out.println("thread finished"+this+", "+thread);
 	}
 
 	private void processNode(Node node) {
 		try {
-			System.out.println("Processing node with path:" + node.getPath());
 			final String content = node.getProperty("jcr:content/jcr:data").getString();
-			System.out.println("content: " + content);
-			System.out.println("Enhancer running with " + ejm.getActiveEngines().size() + " active engines.");
 			String mimeType = getMimeType(node);
 			UriRef contentUri = getUri(node);
-			System.out.println("Mime-type: "+mimeType);
 			ContentItem c = new InMemoryContentItem(contentUri.getUnicodeString(), content.getBytes(), mimeType);
 			try {
 				ejm.enhanceContent(c);
@@ -183,7 +175,7 @@ public class EnhancingObserver implements EventListener, Runnable {
 				throw new RuntimeException("Exception enhancing content", ex);
 			}
 			MGraph metadata = c.getMetadata();
-			MGraph enhancementMGraph = getEnhancementMGraph();
+			MGraph enhancementMGraph = Utils.getEnhancementMGraph(tcManager);
 			GraphNode contentGN = new GraphNode(contentUri, enhancementMGraph);
 			Iterator<GraphNode> enhancementsIter = contentGN.getSubjectNodes(org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_EXTRACTED_FROM);
 			//adding to set to avoid concurrent modification
@@ -204,23 +196,6 @@ public class EnhancingObserver implements EventListener, Runnable {
 		}
 	}
 	
-	private UriRef getUri(Node node) throws RepositoryException {
-		return new UriRef("urn:x-localinstance:"+node.getPath());
-	}
-
-	private LockableMGraph getEnhancementMGraph() {
-		try {
-			return tcManager.getMGraph(enhancementMGraphUri);
-		} catch (NoSuchEntityException e) {
-			synchronized (this) {
-				try {
-					return tcManager.getMGraph(enhancementMGraphUri);
-				} catch (NoSuchEntityException e1) {
-					return tcManager.createMGraph(enhancementMGraphUri);
-				}
-			}
-		}
-	}
 
 	private String getMimeType(Node n) throws ValueFormatException, RepositoryException {
 		try {
@@ -228,5 +203,9 @@ public class EnhancingObserver implements EventListener, Runnable {
 		} catch (PathNotFoundException ex) {
 			return "application/octet-stream";
 		}
+	}
+
+	public static UriRef getUri(Node node) throws RepositoryException {
+		return Utils.getUri(node.getPath());
 	}
 }
