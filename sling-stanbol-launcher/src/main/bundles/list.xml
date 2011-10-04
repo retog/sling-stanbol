@@ -18,6 +18,14 @@
     under the License.
 -->
 <bundles>
+	<startLevel level="15">
+		<bundle>
+			<!--  this bundle is provided by the SLING-2192 patch -->
+			<groupId>org.apache.sling</groupId>
+			<artifactId>org.apache.sling.jaxrs</artifactId>
+		    <version>1.0-SNAPSHOT</version>
+		</bundle>
+	</startLevel>
 	<!-- Clerezza storage and sparql infrastructure -->
 	<startLevel level="16">
 		<bundle><!--  needed this newer version by org.apache.stanbol.commons.solr -->
@@ -339,6 +347,11 @@
 		</bundle>
 	</startLevel>
 	<startLevel level="20">
+		<bundle>
+			<groupId>org.apache.clerezza</groupId>
+			<artifactId>jaxrs.rdf.providers</artifactId>
+			<version>0.13-incubating-SNAPSHOT</version>
+		</bundle>
 		<bundle>
 			<groupId>org.wymiwyg.sling-stanbol</groupId>
 			<artifactId>sling-stanbol-servlet</artifactId>
