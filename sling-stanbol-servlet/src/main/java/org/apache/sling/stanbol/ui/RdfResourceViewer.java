@@ -21,7 +21,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.clerezza.rdf.core.Graph;
 import org.apache.clerezza.rdf.core.UriRef;
 import org.apache.clerezza.rdf.core.access.TcManager;
 import org.apache.clerezza.rdf.utils.GraphNode;
@@ -66,8 +65,6 @@ public class RdfResourceViewer extends SlingSafeMethodsServlet {
 		UriRef uri = Utils.getUri(resource.getPath());
 		GraphNode gn = new GraphNode(uri, Utils.getEnhancementMGraph(tcManager));
 		return gn;
-		/*Graph metadata = gn.getNodeContext();
-		return metadata;*/
 	}
 	
 

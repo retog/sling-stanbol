@@ -1,0 +1,56 @@
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+		<script src="/apps/vie/underscore-min.js"></script>
+		<script src="/apps/vie/backbone-min.js"></script>
+		<!-- <script src="/apps/vie/vie.js"></script> -->
+		<script src="/apps/vie/vie-wymeditor.js"></script>
+		<script src="/apps/vie/vie-containermanager.js"></script>
+		<script src="/apps/vie/wymeditor/jquery.wymeditor.js"></script>
+		<script>
+            jQuery(document).ready(function() {
+
+                // Implement our own Backbone.sync method
+                Backbone.sync = function(method, model, options) {
+                	console.log(method, JSON.stringify(model));
+                	alert(JSONLD.stringify(model));
+                	//for now we simply put the content to a hidden field
+                	jQuery('#posttext').val(model.get("sioc:content"))
+                };
+
+                // Load all RDFa entities into VIE
+                VIE.RDFaEntities.getInstances();
+                // Make all RDFa entities editable
+                jQuery('[typeof][about]').each(function() {
+                    jQuery(this).vieWymeditor();
+                });
+
+                jQuery('.hform').submit(function() {
+                    
+                    // Update the dom
+                    for (var wi = 0, wl = WYMeditor.INSTANCES.length; wi<wl; wi++) {
+                        $(WYMeditor.INSTANCES[wi]._element[0]).html( WYMeditor.INSTANCES[wi].xhtml() );
+                    }
+                    
+                    // Go through all Backbone model instances loaded for the page
+                    jQuery.each(VIE.ContainerManager.instances, function(index, objectInstance) {
+                        var modifiedProperties = {};
+
+                        // Go through editables of the model instance
+                        jQuery.each(objectInstance.editables, function(propertyName, editableInstance) {
+                            // We dont have a "isModified" method...
+                            // Copy editable contents to the modifiedProperties object
+                            modifiedProperties[propertyName] = editableInstance.xhtml();
+                        });
+
+                        if (jQuery.isEmptyObject(modifiedProperties))
+                        {
+                            // No modified editables for this object, skip
+                            return true;
+                        }
+
+                        // Set the modified properties to the model instance
+                        objectInstance.set(modifiedProperties);
+                        objectInstance.save(null);
+                    });
+                });
+            });
+        </script>

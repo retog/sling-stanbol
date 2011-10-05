@@ -16,12 +16,15 @@
  */
 package org.apache.sling.stanbol.ui;
 
+import javax.jcr.Node;
+import javax.jcr.PathNotFoundException;
+import javax.jcr.RepositoryException;
+import javax.jcr.ValueFormatException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.clerezza.rdf.core.Graph;
 import org.apache.clerezza.rdf.core.UriRef;
 import org.apache.clerezza.rdf.core.access.TcManager;
 import org.apache.clerezza.rdf.utils.GraphNode;
@@ -63,18 +66,28 @@ public class StanbolResourceViewer extends SlingSafeMethodsServlet {
 	
 	@GET
 	@Produces("*/*")
-	public String getPage(@Context UriInfo uriInfo, @Context SlingHttpServletRequest request) {
+	public ResourcePage getPage(@Context UriInfo uriInfo, @Context SlingHttpServletRequest request) throws ValueFormatException, RepositoryException {
 		//SlingHttpServletRequest slingRequest =
 		Resource resource = request.getResource();
 		if (ResourceUtil.isNonExistingResource(resource)) {
             throw new ResourceNotFoundException(
                 resource.getPath(), "No resource found");
         }
+		String mimeType = getMimeType(resource.adaptTo(Node.class));
+		if (mimeType.equals("text/html")) {
+			//add wink editor
+		}
 		UriRef uri = Utils.getUri(resource.getPath());
 		GraphNode gn = new GraphNode(uri, Utils.getEnhancementMGraph(tcManager));
-		Graph metadata = gn.getNodeContext();
-		return metadata.toString();
+		return new ResourcePage(gn, true);
 	}
 	
+	private String getMimeType(Node n) throws ValueFormatException, RepositoryException {
+		try {
+			return n.getProperty("jcr:content/jcr:mimeType").getString();
+		} catch (PathNotFoundException ex) {
+			return "application/octet-stream";
+		}
+	}
 
 }
