@@ -64,7 +64,7 @@
 					</instructions>
 				</configuration>
 			</plugin>
-			<plugin>
+			<!-- <plugin>
 				<artifactId>maven-remote-resources-plugin</artifactId>
 				<version>1.2.1</version>
 				<executions>
@@ -75,9 +75,41 @@
 						</goals>
 						<configuration>
 							<resourceBundles>
+								<resourceBundle>eu.iks-project:annotate.js:1.0-SNAPSHOT</resourceBundle>
+							</resourceBundles>
+							<outputDirectory>${project.build.directory}/maven-shared-archive-resources/initial-content/apps/annotate.js/</outputDirectory>
+							<attached>false</attached>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin> -->
+			<plugin>
+				<artifactId>maven-remote-resources-plugin</artifactId>
+				<version>1.2.1</version>
+				<executions>
+					<execution>
+						<id>copy-vie</id>
+						<goals>
+							<goal>process</goal>
+						</goals>
+						<configuration>
+							<resourceBundles>
 								<resourceBundle>eu.iks-project:vie:1.0-SNAPSHOT</resourceBundle>
 							</resourceBundles>
-							<outputDirectory>${project.build.directory}/maven-shared-archive-resources/initial-content/apps/vie</outputDirectory>
+							<outputDirectory>${project.build.directory}/maven-shared-archive-resources/initial-content/apps/vie/</outputDirectory>
+							<attached>false</attached>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-annotate-js</id>
+						<goals>
+							<goal>process</goal>
+						</goals>
+						<configuration>
+							<resourceBundles>
+								<resourceBundle>eu.iks-project:annotate.js:1.0-SNAPSHOT</resourceBundle>
+							</resourceBundles>
+							<outputDirectory>${project.build.directory}/maven-shared-archive-resources/initial-content/apps/annotate.js/</outputDirectory>
 							<attached>false</attached>
 						</configuration>
 					</execution>

@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.jcr.RepositoryException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -40,12 +41,16 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 			OutputStream entityStream) throws IOException,
 			WebApplicationException {
 		PrintWriter out = new PrintWriter(entityStream);
-		writePage(t, out);
+		try {
+			writePage(t, out);
+		} catch (RepositoryException e) {
+			throw new WebApplicationException();
+		}
 		out.flush();
 		
 	}
 
-	protected void writePage(ResourcePage t, PrintWriter out) throws IOException {
+	protected void writePage(ResourcePage t, PrintWriter out) throws IOException, RepositoryException {
 		out.println("<html>");
 		out.println("<head>");
 		printHead(t, out);
@@ -56,30 +61,29 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 		out.println("</html>");
 	}
 
-	protected void printBody(ResourcePage t, PrintWriter out) {
+	protected void printBody(ResourcePage t, PrintWriter out) throws IOException, RepositoryException {
 		if (t.isVieEditorEnabled()) {
-			out.println("hello vie");
-			out.println("<form class=\"hform\" method=\"POST\" action=\".\" enctype=\"multipart/form-data\">	   ");
-			out.println("				<p><label>Title</label>");
-			out.println("					<input name=\"title\" id=\"title\" type=\"text\" size=\"80\" value=\"TESTTITLE\"></p>");
-			/*out.println("					<% //there seems to be a problem with empty text");
-			out.println("					var posttext = getCurrentNodeValue(\"posttext\")");
-			out.println("					if (posttext == \"\") {");
-			out.println("						posttext = \" \"");
-			out.println("					}");
-			out.println("					%>");*/
-			out.println("					<div id=\"myarticle\" typeof=\"http://rdfs.org/sioc/ns#Post\"");
-			out.println("						about=\"TESTURI\">");
-			out.println("				        <div property=\"sioc:content\"><%=  posttext %></div>");
-			out.println("				    </div>");
-			out.println("					");
-			out.println("					<input name=\"posttext\" id=\"posttext\" type=\"hidden\" size=\"80\" value=\"<%= posttext %>\">");
-			out.println("					");
-			out.println("					<p><label>File</label><input type=\"file\" name=\"attachments/*\"/></p>");
-			out.println("					<input type=\"hidden\" name=\"created\"/>");
-			/*out.println("					<input name=\":redirect\" type=\"hidden\" value=\"/content/espblog/posts.admin.html\"/>");*/
-			out.println("				<input type=\"submit\" value=\"Post\" class=\"button\">");
-			out.println("			</form>");
+			out.println("<div  xmlns:sioc     = \"http://rdfs.org/sioc/ns#\"");
+			out.println("         xmlns:schema   = \"http://www.schema.org/\"");
+			out.println("         xmlns:enhancer = \"http://fise.iks-project.eu/ontology/\"");
+			out.println("         xmlns:dc       = \"http://purl.org/dc/terms/\">");
+			out.println("        <div class=\"panel\" id=\"webview\">");
+			out.println("");
+			out.println("            <button class=\"enhanceButton\">Enhance!</button>");
+			out.println("");
+			out.println("            <button class=\"acceptAllButton\" style=\"display:none;\">Accept all</button>");
+			out.println("            <article typeof=\"schema:CreativeWork\" about=\"http://stanbol.apache.org/enhancertest\">");
+			out.println("                <div property=\"sioc:content\" id=\"content\">");
+			final String content = t.getJcrNode().getProperty("jcr:content/jcr:data").getString();
+			out.println(content);
+			out.println("                </div>");
+			out.println("            </article>");
+			out.println("            <button class=\"enhanceButton\">Enhance!</button>");
+			out.println("            <button class=\"acceptAllButton\" style=\"display:none;\">Accept all</button>");
+			out.println("");
+			out.println("        </div>");
+			out.println("        <div id=\"loadingDiv\"><img src=\"spinner.gif\"/></div>");
+			out.println("    </div>");
 		}
 		out.println("hello world");
 		
