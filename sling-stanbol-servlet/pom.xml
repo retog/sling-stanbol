@@ -38,14 +38,14 @@
 	</description>
 
 	<build>
-		<resources>
+		<!-- <resources>
 			<resource>
 	        	<directory>src/main/resources</directory>
 			</resource>
 			<resource>
 	        	<directory>${project.build.directory}/generated-resources</directory>
 			</resource>
-		</resources>
+		</resources> -->
 		<plugins>
 
 			<!-- Generation of SCR descriptors -->
@@ -65,24 +65,22 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-scm-plugin</artifactId>
-				<version>1.5</version>
+				<artifactId>maven-remote-resources-plugin</artifactId>
+				<version>1.2.1</version>
 				<executions>
-				<execution>
-					<id>perform-checkout</id>
-					<configuration>
-						<connectionUrl>scm:git:git://github.com/IKS/VIE.git</connectionUrl>
-						<checkoutDirectory>${project.build.directory}/generated-resources/initial-content/apps/vie</checkoutDirectory>
-						<scmVersionType>branch</scmVersionType>
-						<scmVersion>wymeditor</scmVersion>
-						<!-- <excludes>.git/*</excludes> -->
-					</configuration>
-					<phase>generate-resources</phase>
-					<goals>
-						<goal>checkout</goal>
-					</goals>
-				</execution>
+					<execution>
+						<id>process-remote-resources</id>
+						<goals>
+							<goal>process</goal>
+						</goals>
+						<configuration>
+							<resourceBundles>
+								<resourceBundle>eu.iks-project:vie:1.0-SNAPSHOT</resourceBundle>
+							</resourceBundles>
+							<outputDirectory>${project.build.directory}/maven-shared-archive-resources/initial-content/apps/vie</outputDirectory>
+							<attached>false</attached>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>
