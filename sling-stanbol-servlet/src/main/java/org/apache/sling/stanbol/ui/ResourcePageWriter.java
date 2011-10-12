@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
 
 import javax.jcr.RepositoryException;
 import javax.ws.rs.WebApplicationException;
@@ -73,9 +74,21 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 			out.println("");
 			out.println("            <button class=\"acceptAllButton\" style=\"display:none;\">Accept all</button>");
 			out.println("            <article typeof=\"schema:CreativeWork\" about=\"http://stanbol.apache.org/enhancertest\">");
-			out.println("                <div property=\"sioc:content\" id=\"content\">");
+			out.println("                <div property=\"sioc:content\" >");//id=\"content\">");
 			final String content = t.getJcrNode().getProperty("jcr:content/jcr:data").getString();
-			out.println(content);
+			out.println("<iframe id=\"content\" width=\"80%\" height=\"80%\" src=\"data:text/html,"+URLEncoder.encode(content, "utf-8")
+			.replace("+"," ")
+			+"\" >");
+	//out.println(content);
+	out.println("no object");
+	out.println("</iframe>");
+			//out.println("<iframe id=\"content\" width=\"80%\" height=\"80%\" srcdoc=\""+content.replace("\"","&quot;").replace("&","&amp;")+"\" >iframe child</iframe>");
+			/*out.println("<object id=\"content\" width=\"80%\" height=\"80%\" data=\"data:text/html,"+URLEncoder.encode(content, "utf-8")
+					.replace("+"," ")
+					+"\" >");
+			//out.println(content);
+			out.println("no object");
+			out.println("</object>");*/
 			out.println("                </div>");
 			out.println("            </article>");
 			out.println("            <button class=\"enhanceButton\">Enhance!</button>");
@@ -85,7 +98,7 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 			out.println("        <div id=\"loadingDiv\"><img src=\"spinner.gif\"/></div>");
 			out.println("    </div>");
 		}
-		out.println("hello world");
+
 		
 	}
 

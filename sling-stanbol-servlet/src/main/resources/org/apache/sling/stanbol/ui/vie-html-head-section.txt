@@ -5,8 +5,8 @@
     <script type="text/javascript" src="/apps/annotate.js/underscore-min.js"></script>
     <script type="text/javascript" src="/apps/annotate.js/backbone.js"></script>
 
-    <script type="text/javascript" src="/apps/annotate.js/hallo/hallo.js"></script>
-    <script type="text/javascript" src="/apps/annotate.js/hallo/format.js"></script>
+    <!-- <script type="text/javascript" src="/apps/annotate.js/hallo/hallo.js"></script>
+    <script type="text/javascript" src="/apps/annotate.js/hallo/format.js"></script> -->
 
     <script type="text/javascript" src="/apps/annotate.js/jquery.rdfquery.debug.js"></script>
     <script type="text/javascript" src="/apps/annotate.js/vie/vie-latest.debug.js"></script>
@@ -49,88 +49,146 @@
     </style>
 
     <script>
-    $(document).ready(function(){
-        $('#loadingDiv')
-        .hide()  // hide it initially
-        .ajaxStart(function() {
-            $(this).show();
-        })
-        .ajaxStop(function() {
-            $(this).hide();
-        });
-        var z = new VIE();
-        z.use(new z.StanbolService({url : "/stanbol"}));
 
-        // make the content element editable
-        $('#content').hallo({
-            plugins: {
-              'halloformat': {}
-            },
-            editable: true
-        });
-        $('#content').annotate({
-            vie: z,
-            vieServices: ["stanbol"],
-            debug: true,
-            decline: function(event, ui){
-                console.info('decline event', event, ui);
-            },
-            select: function(event, ui){
-                console.info('select event', event, ui);
-            },
-            remove: function(event, ui){
-                console.info('remove event', event, ui);
-            }
+    
+    
+    //$(document).ready(function(){
+    //$("#content").contents().find(.ready(function(){
+//$('#content').load(function() {
 
-        });
+//iframeReady = function() {
+$(document).ready(function(){
+	var objDoc = $($("#content").get(0).contentWindow.document)
+	
+	objDoc.ready(function(){
+		$("body", objDoc).attr("id","content");
+		$("body", objDoc).attr("xmlns:sioc","http://rdfs.org/sioc/ns#");
+        $("body", objDoc).attr("xmlns:schema","http://www.schema.org/");
+        $("body", objDoc).attr("xmlns:enhancer","http://fise.iks-project.eu/ontology/");
+         $("body", objDoc).attr("xmlns:dc","http://purl.org/dc/terms/");
+        $("body", objDoc).attr("typeof","schema:CreativeWork");
+        $("body", objDoc).attr("about","http://stanbol.apache.org/enhancertest");
+		$("body", objDoc).attr("property","sioc:content");
+	    	alert('faaaa');
+	
+			$('body', objDoc).append("<h1>foo</h1>");
+			$('head', objDoc).append('<script>alert(\'from inner\')<'+'/script>');
+			function addScript(path) {
+				$('head', objDoc).append('<script type="text/javascript" src="'+path+'"><'+'/script>');
+			}
+			addScript('/apps/annotate.js/Smoothness/jquery.ui.all.css')
 
-        $('.acceptAllButton')
-        .button()
-        .hide()
-        .click(function(){
-            $('#content').annotate('acceptAll', function(report){
-                console.log('AcceptAll finished with the report:', report);
-            });
-        });
+    addScript('/apps/annotate.js/jquery-1.5.1.js')
+    addScript('/apps/annotate.js/jquery-ui.1.9m5.js')
+    addScript('/apps/annotate.js/underscore-min.js')
+    addScript('/apps/annotate.js/backbone.js')
 
-        $('.enhanceButton')
-        .button({enhState: 'passiv'})
-        .click(function(){
-            // Button with two states
-            var oldState = $(this).button('option', 'enhState');
-            var newState = oldState === 'passiv' ? 'active' : 'passiv';
-            $('.enhanceButton').button('option', 'enhState', newState);
-            if($(this).button('option', 'enhState') === 'active'){
-                // annotate.enable()
-                try {
-                    $('#content').annotate('enable', function(success){
-                        if(success){
-                            $('.enhanceButton')
-                            .button('enable')
-                            .button('option', 'label', 'Done');
+    addScript('/apps/annotate.js/hallo/hallo.js')
+    addScript('/apps/annotate.js/hallo/format.js')
 
-                            $('.acceptAllButton')
-                            .show()
-                        } else {
-                            $('.enhanceButton')
-                            .button('enable')
-                            .button('option', 'label', 'error, see the log.. Try to enhance again!');
-                        }
-                    });
-                    $('.enhanceButton')
-                    .button('disable')
-                    .button('option', 'label', 'in progress...')
-                } catch (e) {
-                    alert(e);
-                }
+    addScript('/apps/annotate.js/jquery.rdfquery.debug.js')
+    addScript('/apps/annotate.js/vie/vie-latest.debug.js')
 
-            } else {
-                // annotate.disable()
-                $('#content').annotate('disable');
-                $('.enhanceButton').button('option', 'label', 'Enhance!');
-                $('.acceptAllButton')
-                .hide()
-            }
-        });
+    addScript('/apps/annotate.js/annotate.js')
+	addScript('/apps/annotate.js/hallo/hallo.js')
+		$('#loadingDiv')
+	        .hide()  // hide it initially
+	        .ajaxStart(function() {
+	            $(this).show();
+	        })
+	        .ajaxStop(function() {
+	            $(this).hide();
+	        });
+	        var z = new VIE();
+	        z.use(new z.StanbolService({url : "/stanbol"}));
+	
+	        // make the content element editable
+	        //var content = $("#content").contents().find("body")
+	        //var document = $("#content").contents()
+	       
+	        
+	        $("#content", objDoc).hallo({
+	            plugins: {
+	              'halloformat': {}
+	            },
+	            editable: true
+	        });
+	        $("body", objDoc).annotate({
+	            vie: z,
+	            vieServices: ["stanbol"],
+	            debug: true,
+	            decline: function(event, ui){
+	                console.info('decline event', event, ui);
+	            },
+	            select: function(event, ui){
+	                console.info('select event', event, ui);
+	            },
+	            remove: function(event, ui){
+	                console.info('remove event', event, ui);
+	            }
+	
+	        });
+	
+	        $('.acceptAllButton')
+	        .button()
+	        .hide()
+	        .click(function(){
+	            $("#content").contents().find("body").annotate('acceptAll', function(report){
+	                console.log('AcceptAll finished with the report:', report);
+	            });
+	        });
+	
+	        $('.enhanceButton')
+	        .button({enhState: 'passiv'})
+	        .click(function(){
+	            // Button with two states
+	            var oldState = $(this).button('option', 'enhState');
+	            var newState = oldState === 'passiv' ? 'active' : 'passiv';
+	            $('.enhanceButton').button('option', 'enhState', newState);
+	            if($(this).button('option', 'enhState') === 'active'){
+	                // annotate.enable()
+	                try {
+	                    $("#content").contents().find("body").annotate('enable', function(success){
+	                        if(success){
+	                            $('.enhanceButton')
+	                            .button('enable')
+	                            .button('option', 'label', 'Done');
+	
+	                            $('.acceptAllButton')
+	                            .show()
+	                        } else {
+	                            $('.enhanceButton')
+	                            .button('enable')
+	                            .button('option', 'label', 'error, see the log.. Try to enhance again!');
+	                        }
+	                    });
+	                    $('.enhanceButton')
+	                    .button('disable')
+	                    .button('option', 'label', 'in progress...')
+	                } catch (e) {
+	                    alert(e);
+	                }
+	
+	            } else {
+	                // annotate.disable()
+	                $("#content").contents().find("body").annotate('disable');
+	                $('.enhanceButton').button('option', 'label', 'Enhance!');
+	                $('.acceptAllButton')
+	                .hide()
+	            }
+	        });
+	    });
     });
+    /*
+        $(function() {
+  function manipIframe() {
+    el = $('body', $('#content').contents());
+    if (el.length != 1) {
+      setTimeout(manipIframe, 100);
+      return;
+    }
+    iframeReady();
+  }
+  manipIframe();
+});*/
     </script>
