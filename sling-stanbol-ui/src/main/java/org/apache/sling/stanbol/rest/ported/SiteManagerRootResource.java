@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sling.stanbol.rest;
+package org.apache.sling.stanbol.rest.ported;
 
 import static javax.ws.rs.core.MediaType.TEXT_HTML;
 import static org.apache.clerezza.rdf.core.serializedform.SupportedFormat.N3;
