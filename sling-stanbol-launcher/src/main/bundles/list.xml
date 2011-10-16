@@ -359,7 +359,7 @@
 		</bundle>
 		<bundle>
 			<groupId>org.wymiwyg.sling-stanbol</groupId>
-			<artifactId>sling-stanbol-servlet</artifactId>
+			<artifactId>sling-stanbol-ui</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</bundle>
 		<bundle>

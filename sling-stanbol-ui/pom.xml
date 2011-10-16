@@ -84,6 +84,19 @@
 				</executions>
 			</plugin> -->
 			<plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>animal-sniffer-maven-plugin</artifactId>
+                    <version>1.7</version>
+                    <configuration>
+                        <signature>
+                            <groupId>org.codehaus.mojo.signature</groupId>
+                            <artifactId>java16</artifactId>
+                            <version>1.0</version>
+                        </signature>
+                    </configuration>
+                </plugin>
+
+			<plugin>
 				<artifactId>maven-remote-resources-plugin</artifactId>
 				<version>1.2.1</version>
 				<executions>
@@ -177,5 +190,33 @@
 			<artifactId>sling-stanbol-commons</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
+		
+		    <!-- dependencies on other Entityhub modules -->
+	    <dependency>
+	      <groupId>org.apache.stanbol</groupId>
+	      <artifactId>org.apache.stanbol.entityhub.servicesapi</artifactId>
+	      <version>0.9.0-incubating-SNAPSHOT</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.apache.stanbol</groupId>
+	      <artifactId>org.apache.stanbol.entityhub.core</artifactId>
+	      <version>0.9.0-incubating-SNAPSHOT</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.apache.stanbol</groupId>
+	      <artifactId>org.apache.stanbol.entityhub.model.clerezza</artifactId>
+	      <version>0.9.0-incubating-SNAPSHOT</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.apache.stanbol</groupId>
+	      <artifactId>org.apache.stanbol.entityhub.query.clerezza</artifactId>
+	      <version>0.9.0-incubating-SNAPSHOT</version>
+	    </dependency>
+	    
+	    <dependency>
+	    	<groupId>org.codehaus.jettison</groupId>
+	    	<artifactId>jettison</artifactId>
+	    	<version>1.3</version>
+	    </dependency>
 	</dependencies>
 </project>

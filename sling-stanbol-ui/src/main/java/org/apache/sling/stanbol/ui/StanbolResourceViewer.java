@@ -75,13 +75,13 @@ public class StanbolResourceViewer extends SlingSafeMethodsServlet {
         }
 		Node jcrNode = resource.adaptTo(Node.class);
 		String mimeType = getMimeType(jcrNode);
-		boolean winkEnable = false;
+		boolean vieEditorEnabled = false;
 		if (mimeType.equals("text/html")) {
-			winkEnable = true;
+			vieEditorEnabled = true;
 		}
 		UriRef uri = Utils.getUri(resource.getPath());
 		GraphNode gn = new GraphNode(uri, Utils.getEnhancementMGraph(tcManager));
-		return new ResourcePage(gn, jcrNode, winkEnable);
+		return new ResourcePage(gn, jcrNode, vieEditorEnabled);
 	}
 	
 	private String getMimeType(Node n) throws ValueFormatException, RepositoryException {

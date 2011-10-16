@@ -5,19 +5,35 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 @Component(immediate=true, metatype=false)
 @Service(Object.class)
@@ -74,19 +90,62 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 			out.println("            <button class=\"acceptAllButton\" style=\"display:none;\">Accept all</button>");
 			out.println("            <article typeof=\"schema:CreativeWork\" about=\"http://stanbol.apache.org/enhancertest\">");
 			out.println("                <div property=\"sioc:content\" id=\"content\">");
-			final String content = t.getJcrNode().getProperty("jcr:content/jcr:data").getString();
-			out.println(content);
+			out.println(getContent(t.getJcrNode()));
 			out.println("                </div>");
 			out.println("            </article>");
 			out.println("            <button class=\"enhanceButton\">Enhance!</button>");
 			out.println("            <button class=\"acceptAllButton\" style=\"display:none;\">Accept all</button>");
 			out.println("");
 			out.println("        </div>");
-			out.println("        <div id=\"loadingDiv\"><img src=\"spinner.gif\"/></div>");
+			out.println("        <div id=\"loadingDiv\"><img src=\"/stanbol/spinner.gif\"/></div>");
 			out.println("    </div>");
 		}
 		out.println("hello world");
 		
+	}
+
+	private String getContent(Node jcrNode) throws IOException, RepositoryException {
+		final String content = jcrNode.getProperty("jcr:content/jcr:data").getString();
+		try {
+			//StreamSource inputSource = new StreamSource(new StringReader(content));
+			InputSource inputSource = new InputSource(new StringReader(content));
+			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSource);
+			Element docElem = doc.getDocumentElement();
+			System.out.println("docElem: "+docElem);
+			DOMSource domSource;
+			if (docElem.getNodeName().equalsIgnoreCase("html")) {
+				Element body = (Element) doc.getElementsByTagName("body").item(0);
+				doc.renameNode(body, null, "div");
+				body.setAttribute("id", "body-replacement");
+				/*Element replacementDiv = doc.createElement("div");
+				replacementDiv.setAttribute("id", "body-replacement");
+				NodeList bodyChildren = body.getChildNodes();
+				for (int i = 0; i < bodyChildren.getLength(); i++) {
+					body.removeChild(bodyChildren.item(i));
+					replacementDiv.appendChild(bodyChildren.item(i));
+				}
+				domSource = new DOMSource(replacementDiv);*/
+				domSource = new DOMSource(body);
+
+			} else {
+				domSource = new DOMSource(doc);
+			}
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer transformer = tf.newTransformer();
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			StringWriter out = new StringWriter();
+			StreamResult streamResult = new StreamResult(out);
+			transformer.transform(domSource, streamResult);
+			return out.toString();
+		} catch (SAXException e) {
+			throw new RuntimeException(e);
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		} catch (TransformerConfigurationException e) {
+			throw new RuntimeException(e);
+		} catch (TransformerException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	protected void printHead(ResourcePage t, PrintWriter out) throws IOException {
