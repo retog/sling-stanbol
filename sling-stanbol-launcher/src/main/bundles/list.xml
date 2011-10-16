@@ -348,6 +348,11 @@
 	</startLevel>
 	<startLevel level="20">
 		<bundle>
+			<groupId>org.apache.sling</groupId>
+			<artifactId>org.apache.sling.extensions.jaxrs</artifactId>
+			<version>0.9.9-SNAPSHOT</version>
+		</bundle>
+		<bundle>
 			<groupId>org.apache.clerezza</groupId>
 			<artifactId>jaxrs.rdf.providers</artifactId>
 			<version>0.13-incubating-SNAPSHOT</version>
