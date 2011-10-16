@@ -32,7 +32,7 @@
   </description>
 
   <modules>
-	<module>sling-stanbol-servlet</module>
+	<module>sling-stanbol-ui</module>
 	<module>sling-stanbol-jcr-observer</module>
 	<module>sling-stanbol-fragment</module>
 	<module>sling-stanbol-commons</module>
