@@ -85,7 +85,6 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 			out.println("         xmlns:dc       = \"http://purl.org/dc/terms/\">");
 			out.println("        <div class=\"panel\" id=\"webview\">");
 			out.println("");
-			out.println("            <button class=\"enhanceButton\">Enhance!</button>");
 			out.println("");
 			out.println("            <button class=\"acceptAllButton\" style=\"display:none;\">Accept all</button>");
 			out.println("            <article typeof=\"schema:CreativeWork\" about=\"http://stanbol.apache.org/enhancertest\">");
@@ -95,6 +94,7 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 			out.println("            </article>");
 			out.println("            <button class=\"enhanceButton\">Enhance!</button>");
 			out.println("            <button class=\"acceptAllButton\" style=\"display:none;\">Accept all</button>");
+			out.println("            <br/><button class=\"saveButton\">Save</button>");
 			out.println("");
 			out.println("        </div>");
 			out.println("        <div id=\"loadingDiv\"><img src=\"/stanbol/spinner.gif\"/></div>");
@@ -111,7 +111,6 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 			InputSource inputSource = new InputSource(new StringReader(content));
 			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSource);
 			Element docElem = doc.getDocumentElement();
-			System.out.println("docElem: "+docElem);
 			DOMSource domSource;
 			if (docElem.getNodeName().equalsIgnoreCase("html")) {
 				Element body = (Element) doc.getElementsByTagName("body").item(0);

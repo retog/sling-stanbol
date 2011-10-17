@@ -92,6 +92,12 @@
                 console.log('AcceptAll finished with the report:', report);
             });
         });
+        
+        $('.saveButton')
+        .button()
+        .click(function(){
+	            alert($('#content').html());
+	     });
 
         $('.enhanceButton')
         .button({enhState: 'passiv'})
