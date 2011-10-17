@@ -16,10 +16,21 @@
  */
 package org.apache.sling.stanbol.commons;
 
+import java.io.IOException;
+import java.io.StringReader;
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.clerezza.rdf.core.UriRef;
 import org.apache.clerezza.rdf.core.access.LockableMGraph;
 import org.apache.clerezza.rdf.core.access.NoSuchEntityException;
 import org.apache.clerezza.rdf.core.access.TcManager;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 public class Utils {
 
@@ -39,5 +50,19 @@ public class Utils {
 	
 	public static UriRef getUri(String path) {
 		return new UriRef("urn:x-localinstance:"+path);
+	}
+	
+	public static Document getXMLDocument(Node node) throws  RepositoryException, IOException {
+		final String content = node.getProperty("jcr:content/jcr:data").getString();
+		InputSource inputSource = new InputSource(new StringReader(content));
+		Document doc;
+		try {
+			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSource);
+		} catch (SAXException e) {
+			throw new IOException(e);
+		} catch (ParserConfigurationException e) {
+			throw new IOException(e);
+		}
+		return doc;
 	}
 }

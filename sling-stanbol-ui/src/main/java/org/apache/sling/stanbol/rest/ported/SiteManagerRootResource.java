@@ -205,7 +205,6 @@ public class SiteManagerRootResource {
                                @FormParam(value = "limit") Integer limit,
                                @FormParam(value = "offset") Integer offset,
                                @Context HttpHeaders headers) {
-    	System.out.println("what's up?");
         log.debug("findEntity() Request");
         Collection<String> supported = new HashSet<String>(JerseyUtils.QUERY_RESULT_SUPPORTED_MEDIA_TYPES);
         supported.add(TEXT_HTML);

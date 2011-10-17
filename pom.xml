@@ -18,26 +18,52 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
-
-
-  <groupId>org.wymiwyg.sling-stanbol</groupId>
-  <artifactId>sling-stanbol</artifactId>
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.apache.sling</groupId>
+		<artifactId>sling</artifactId>
+		<version>12-SNAPSHOT</version>
+	</parent>
+	<groupId>org.wymiwyg.sling-stanbol</groupId>
+	<artifactId>sling-stanbol</artifactId>
 	<version>1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
+	<packaging>pom</packaging>
 
-  <name>Sling-Stanbol Reactor</name>
-  <description>
+	<name>Sling-Stanbol Reactor</name>
+	<description>
     Reactor project to build the various sling-stanbol modules
-  </description>
+	</description>
 
-  <modules>
-	<module>sling-stanbol-ui</module>
-	<module>sling-stanbol-jcr-observer</module>
-	<module>sling-stanbol-fragment</module>
-	<module>sling-stanbol-commons</module>
-	<module>sling-stanbol-launcher</module>  
-  </modules>
-
+	<modules>
+		<module>sling-stanbol-ui</module>
+		<module>sling-stanbol-jcr-observer</module>
+		<module>sling-stanbol-fragment</module>
+		<module>sling-stanbol-commons</module>
+		<module>sling-stanbol-launcher</module>  
+	</modules>
+	<build>	
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>animal-sniffer-maven-plugin</artifactId>
+				<version>1.7</version>
+				<configuration>
+					<signature>
+						<groupId>org.codehaus.mojo.signature</groupId>
+						<artifactId>java16</artifactId>
+						<version>1.0</version>
+					</signature>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>

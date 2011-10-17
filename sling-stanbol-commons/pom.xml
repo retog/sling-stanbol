@@ -21,9 +21,9 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.apache.sling</groupId>
-		<artifactId>sling</artifactId>
-		<version>12-SNAPSHOT</version>
+		<groupId>org.wymiwyg.sling-stanbol</groupId>
+		<artifactId>sling-stanbol</artifactId>
+		<version>1.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>org.wymiwyg.sling-stanbol</groupId>
@@ -50,6 +50,11 @@
 			<groupId>org.apache.clerezza</groupId>
 			<artifactId>rdf.core</artifactId>
 			<version>0.12-incubating-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.sling</groupId>
+			<artifactId>org.apache.sling.jcr.resource</artifactId>
+			<version>2.0.6</version>
 		</dependency>
 	</dependencies>
 </project>

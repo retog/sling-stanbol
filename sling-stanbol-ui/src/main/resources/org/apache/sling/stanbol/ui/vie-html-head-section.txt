@@ -96,7 +96,14 @@
         $('.saveButton')
         .button()
         .click(function(){
-	            alert($('#content').html());
+	        $.ajax({
+			  type: 'POST',
+			  url: window.location,
+			  data: $('#content').html(),
+			  success: function() { alert('saved')},
+			  contentType: 'text/html'
+			});
+		    //alert($('#content').html());
 	     });
 
         $('.enhanceButton')
