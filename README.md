@@ -25,7 +25,9 @@ clone the repo:
 change to the stanbol directory and install with maven
 
     cd stanbol
-    mvn install
+    mvn install -Dmaven.test.skip=true
+
+For some yet unclear reasons, you might have to run the last command again if the build fails.
 
 ### JAX-RS support for sling
 
