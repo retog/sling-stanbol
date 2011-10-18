@@ -1,5 +1,8 @@
     <link rel="stylesheet" href="/stanbol/styles/resource-page.css" />
     <link rel="stylesheet" href="/apps/annotate.js/Smoothness/jquery.ui.all.css" />
+    <link rel="stylesheet" type="text/css" href="/sling.css"/>
+    
+    <script src="/system/sling.js"></script>
 
     <script type="text/javascript" src="/apps/annotate.js/jquery-1.5.1.js"></script>
     <script type="text/javascript" src="/apps/annotate.js/jquery-ui.1.9m5.js"></script>
@@ -102,6 +105,9 @@
 			  url: window.location,
 			  data: $('#content').html(),
 			  success: function() { alert('saved')},
+			  error: function(jqXHR, textStatus, errorThrown) {
+			  	alert('an error occured, are you logged in?')
+			  },
 			  contentType: 'text/html'
 			});
 		    //alert($('#content').html());

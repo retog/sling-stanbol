@@ -1,3 +1,11 @@
 #editArea {
 	margin-top: 3em;	
 }
+
+.logo2 {
+	float: right;
+    width: 27em;
+    height: 81px;
+    text-align: center;
+    background-color: #272727;
+}

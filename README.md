@@ -39,5 +39,7 @@ Finally you can compile sling-stanbol by running `mvn install` in the directory 
 
 - change diretcory to sling-stanbol-launcher/target
 - start the laucher with `java -jar sling-stanbol-launcher-1.0-SNAPSHOT.jar`
+- You may upload html document (using WebDav for example) and open them in the browser, by adding the ".stanbol" suffix to the URI you should see a page that allows enhancing and editing the resource
+- To try the resource page you may go to `http://localhost:8080/turkey.html.stanbol`
 - Try out the enhancer servlet at: `http://localhost:8080/stanbol/enhancer`
 
