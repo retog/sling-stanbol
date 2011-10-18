@@ -172,7 +172,8 @@ public class EnhancingObserver implements EventListener, Runnable {
 			try {
 				ejm.enhanceContent(c);
 			} catch (EngineException ex) {
-				throw new RuntimeException("Exception enhancing content", ex);
+				log.error("Exception enhancing "+node, ex);
+				return;
 			}
 			MGraph metadata = c.getMetadata();
 			MGraph enhancementMGraph = Utils.getEnhancementMGraph(tcManager);
