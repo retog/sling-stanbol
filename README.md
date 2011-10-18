@@ -29,7 +29,15 @@ change to the stanbol directory and install with maven
 
 ### JAX-RS support for sling
 
-TBD
+As [SLING-2192](https://issues.apache.org/jira/browse/SLING-2192) isn't solved yet, you also have to compile this bundle
+
+Clone the repo:
+`git clone git://github.com/retobg/slingrs.git`
+
+change to the slingrs directory and compile with maven:
+
+    cd slingrs
+    mvn install
 
 ### Sling Stanbol
 
