@@ -1,4 +1,5 @@
-<link rel="stylesheet" href="/apps/annotate.js/Smoothness/jquery.ui.all.css" />
+    <link rel="stylesheet" href="/stanbol/styles/resource-page.css" />
+    <link rel="stylesheet" href="/apps/annotate.js/Smoothness/jquery.ui.all.css" />
 
     <script type="text/javascript" src="/apps/annotate.js/jquery-1.5.1.js"></script>
     <script type="text/javascript" src="/apps/annotate.js/jquery-ui.1.9m5.js"></script>

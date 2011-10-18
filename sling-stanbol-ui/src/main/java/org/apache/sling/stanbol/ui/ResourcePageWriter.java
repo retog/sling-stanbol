@@ -7,7 +7,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -84,7 +83,8 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 
 	protected void printBody(ResourcePage t, PrintWriter out) throws IOException, RepositoryException {
 		if (t.isVieEditorEnabled()) {
-			out.println("<div  xmlns:sioc     = \"http://rdfs.org/sioc/ns#\"");
+			out.println("<h2>Edit and Enhance content</h2>");
+			out.println("<div id=\"editArea\" xmlns:sioc     = \"http://rdfs.org/sioc/ns#\"");
 			out.println("         xmlns:schema   = \"http://www.schema.org/\"");
 			out.println("         xmlns:enhancer = \"http://fise.iks-project.eu/ontology/\"");
 			out.println("         xmlns:dc       = \"http://purl.org/dc/terms/\">");
@@ -105,6 +105,8 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 			out.println("        <div id=\"loadingDiv\"><img src=\"/stanbol/spinner.gif\"/></div>");
 			out.println("</div>");
 		}
+		out.println("<h2>Pre Stored-Metadata</h2>");
+		out.println("<iframe width=\"90%\" height=\"30%\" src=\""+t.getJcrNode().getPath()+".rdf\">Sorry your browser is too cool for us.</iframe>");
 		
 	}
 
@@ -166,7 +168,7 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 	}
 
 	protected String getTitle(ResourcePage t) {
-		return "unknown title";
+		return "Stanbol Resource Page";
 	}
 
 }

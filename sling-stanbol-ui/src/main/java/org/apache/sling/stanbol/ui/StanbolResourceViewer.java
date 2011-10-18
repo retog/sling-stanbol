@@ -18,7 +18,6 @@ package org.apache.sling.stanbol.ui;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -171,6 +170,7 @@ public class StanbolResourceViewer {
 		InputSource inputSource = new InputSource(new StringReader(string));
 		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSource);
 		Element docElem = doc.getDocumentElement();
+		docElem.removeAttribute("id");
 		doc.renameNode(docElem, null, "body");
 		return docElem;
 	}
