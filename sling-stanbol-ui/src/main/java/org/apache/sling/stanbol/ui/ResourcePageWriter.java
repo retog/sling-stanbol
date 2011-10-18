@@ -3,10 +3,12 @@ package org.apache.sling.stanbol.ui;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
@@ -27,6 +29,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
@@ -56,7 +59,9 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 			MultivaluedMap<String, Object> httpHeaders,
 			OutputStream entityStream) throws IOException,
 			WebApplicationException {
-		PrintWriter out = new PrintWriter(entityStream);
+		httpHeaders.add("Content-Type", "text/html; charset=utf-8");
+		Writer writer = new OutputStreamWriter(entityStream, "utf-8");
+		PrintWriter out = new PrintWriter(writer);
 		try {
 			writePage(t, out);
 		} catch (RepositoryException e) {
@@ -98,9 +103,8 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 			out.println("");
 			out.println("        </div>");
 			out.println("        <div id=\"loadingDiv\"><img src=\"/stanbol/spinner.gif\"/></div>");
-			out.println("    </div>");
+			out.println("</div>");
 		}
-		out.println("hello world");
 		
 	}
 
@@ -132,10 +136,13 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 			TransformerFactory tf = TransformerFactory.newInstance();
 			Transformer transformer = tf.newTransformer();
 			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-			StringWriter out = new StringWriter();
-			StreamResult streamResult = new StreamResult(out);
+			transformer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			//StringWriter out = new StringWriter();
+			StreamResult streamResult = new StreamResult(baos);
 			transformer.transform(domSource, streamResult);
-			return out.toString();
+			return new String(baos.toByteArray(), "utf-8");
 		} catch (SAXException e) {
 			throw new RuntimeException(e);
 		} catch (ParserConfigurationException e) {

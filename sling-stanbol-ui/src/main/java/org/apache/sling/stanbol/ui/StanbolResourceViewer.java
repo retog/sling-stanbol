@@ -45,6 +45,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.clerezza.rdf.core.UriRef;
 import org.apache.clerezza.rdf.core.access.TcManager;
 import org.apache.clerezza.rdf.utils.GraphNode;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
@@ -146,11 +147,14 @@ public class StanbolResourceViewer {
 			TransformerFactory tf = TransformerFactory.newInstance();
 			Transformer transformer = tf.newTransformer();
 			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-			StringWriter out = new StringWriter();
-			StreamResult streamResult = new StreamResult(out);
+			transformer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+			//StringWriter out = new StringWriter();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			StreamResult streamResult = new StreamResult(baos);
 			transformer.transform(domSource, streamResult);
 			//jcrNode.setProperty("jcr:content/jcr:data", out.toString());
-			jcrNode.getProperty("jcr:content/jcr:data").setValue(out.toString());
+			jcrNode.getProperty("jcr:content/jcr:data").setValue(new String(baos.toByteArray(), "utf-8"));
 			jcrNode.save();
 		} catch (SAXException e) {
 			throw new RuntimeException(e);
