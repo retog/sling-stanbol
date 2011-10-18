@@ -1,0 +1,26 @@
+    <div class="title">
+        <div class="logo">
+            <a href="http://sling.apache.org">
+                <img border="0" src="/sling-logo.png"/>
+            </a>
+        </div>
+        <div class="logo2">
+            <a href="http://incubator.apache.org/stanbol">
+                <img border="0" src="/stanbol/images/stanbol-2010-12-14.png"/>
+            </a>
+        </div>
+    </div>
+    <div class="menu">
+       <div id="menu_login" style="display:none; padding: 10px;">
+          <a href="system/sling/login.html">Login</a> | <a href="signup.html">Sign Up</a>
+     </div>
+       <div id="menu_logout" style="display:none; padding: 10px;">
+          <strong id="menu_username"> ??? </strong> | <a href="system/sling/logout.html">Logout</a>
+     </div>
+    </div> 
+    <div class="main">
+    	<p id="login" style="display:none">
+           You are not currently logged in. To login (use <em>admin/admin</em>
+           to be allowed to write to the repository), follow
+           <a href="system/sling/login" title="Click to Login">this link</a>.
+        </p>
