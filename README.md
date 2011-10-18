@@ -20,7 +20,7 @@ change to the annotate.js/lib directory and install with maven
 ### Stanbol
 
 clone the repo:
-`https://github.com/apache/stanbol.git`
+`git clone https://github.com/apache/stanbol.git`
 
 change to the stanbol directory and install with maven
 
