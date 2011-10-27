@@ -79,7 +79,7 @@ import org.slf4j.LoggerFactory;
 @Component(immediate = true, metatype = false)
 @Service(Object.class)
 @Properties({ @Property(name = "javax.ws.rs", boolValue = true) })
-@Path("/stanbol/entityhub")
+@Path("/slingstanbol/entityhub")
 public class EntityhubRootResource {
     
 	@Context

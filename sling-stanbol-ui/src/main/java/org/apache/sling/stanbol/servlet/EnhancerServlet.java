@@ -50,7 +50,7 @@ import org.apache.stanbol.enhancer.servicesapi.helper.InMemoryContentItem;
     @Property(name="service.description", value="Paths Test Servlet"),
     @Property(name="service.vendor", value="The Apache Software Foundation"),
     @Property(name="sling.servlet.paths", value={
-            "/stanbol/enhancer"
+            "/slingstanbol/enhancer"
     })
 })
 @SuppressWarnings("serial")
