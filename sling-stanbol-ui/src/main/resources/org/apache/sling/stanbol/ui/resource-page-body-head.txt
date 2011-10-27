@@ -12,10 +12,21 @@
     </div>
     <div class="menu">
        <div id="menu_login" style="display:none; padding: 10px;">
-          <a href="system/sling/login.html">Login</a> | <a href="/signup.html">Sign Up</a>
+          <a id="loginLink" href="/system/sling/selector/login">Login</a> | <a href="/signup.html">Sign Up</a>
+          <script>
+          $(document).ready(function() {
+             $('#loginLink').attr('href', '/system/sling/selector/login?resource='+window.location.pathname)
+          });
+          </script>
      </div>
        <div id="menu_logout" style="display:none; padding: 10px;">
-          <strong id="menu_username"> ??? </strong> | <a href="/system/sling/logout.html">Logout</a>
+          <strong id="menu_username"> ??? </strong> | <a id="logoutLink" href="/system/sling/logout.html">Logout</a>
+          <!-- unfortunately this doesn't work: <script>
+	          $(document).ready(function() {
+	             $('#logoutLink').attr('href', '/system/sling/logout.html?resource='+window.location.pathname)
+	          });
+	          </script>
+	      -->
      </div>
     </div> 
     <div class="main">
