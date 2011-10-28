@@ -1,12 +1,7 @@
     <div class="title">
         <div class="logo">
             <a href="http://sling.apache.org">
-                <img border="0" src="/sling-logo.png"/>
-            </a>
-        </div>
-        <div class="logo2">
-            <a href="http://incubator.apache.org/stanbol">
-                <img border="0" src="/slingstanbol/images/stanbol-2010-12-14.png"/>
+                <img border="0" src="/slingstanbol/images/sling-stanbol-combined.png"/>
             </a>
         </div>
     </div>
