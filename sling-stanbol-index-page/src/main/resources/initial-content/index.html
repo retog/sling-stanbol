@@ -1,5 +1,45 @@
 <html>
+	<head>
+		<title>Welcome to Sling-Stanbol</title>
+	</head>
 <body>
+	<div>
+        <div>
+            <a href="/">
+                <img border="0" src="/slingstanbol/images/sling-stanbol-combined.png"/>
+            </a>
+        </div>
+    </div>
 	<h1>Welcome to Slingstanbol</h1>
+	<p>Sling-Stanbol integrates Apache Sling and Apache Stanbol. It provides features to access Stanbol functionality to enhance
+	and process Sling content.</p>
+	<h2>Stanbol</h2>
+	<p>All <a href="http://incubator.apache.org/stanbol/">Stanbol</a> services are available in the OSGi environment and can be 
+	accessed by Sling components. The unaltered Stanbol webinterface is available at <a href="/stanbol/">/stanbol/</a>, it 
+	should provide all functionality as in the Stanbol full launcher, post a bug if something is missing.</p>
+	<h2>Sling</h2>
+	<p>Sling-Stanbol is a <a href="http://sling.apache.org">Sling</a> launcher extending the default Sling Launcher with 
+	bundles to integrate the Stanbol features. It also includes support for JAX-RS resources and includes the Clerezza 
+	JAX-RS Utilities for RDF.</p>
+	<h2>Sling-Stanbol</h2>
+	<p>Sling-Stanbol provides a Resource-Page that can be used enhance HTML resources with RDFa annotations. Thanks to
+	the Stanbol suggestions annotating documents becomes easy.</p>
+	<p>You may upload HTML documents via WebDav or check it out with one of the example documents:
+	<ul>
+		<li><a href="/slingstanbol/howl.html.stanbol">/slingstanbol/howl.html.stanbol</a></li>
+		<li><a href="/slingstanbol/turkey.html.stanbol">/slingstanbol/turkey.html.stanbol</a></li>
+	</ul>
+	</p>
+	<p>On the resource-page you an also see pre-computed meta-data, this is generated whenever a document is added
+	or modified. It can be accessed by adding ".rdf" to the end of the URI (webinterface).</p>
+	<p>The precomputed metdata is stored in a graph than can also be accessed from Stanbol, for instance you can use the Stanbol Sparql endpoint to query it. 
+	You can, for example, use the form at <a href="/stanbol/sparql">/stanbol/sparql</a> and the following query to get all triples from the enhancement graph:</p>
+	<pre class="code">
+	SELECT *
+	WHERE {
+	    GRAPH &lt;urn:x-localinstance:/enhancement.graph> {?s ?p ?o}
+	}
+	</pre>
+	
 </body>
 </html>

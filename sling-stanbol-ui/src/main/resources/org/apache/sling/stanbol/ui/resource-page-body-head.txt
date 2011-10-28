@@ -1,6 +1,6 @@
     <div class="title">
         <div class="logo">
-            <a href="http://sling.apache.org">
+            <a href="/">
                 <img border="0" src="/slingstanbol/images/sling-stanbol-combined.png"/>
             </a>
         </div>
@@ -27,6 +27,5 @@
     <div class="main">
     	<p id="login" style="display:none">
            You are not currently logged in. To login (use <em>admin/admin</em>
-           to be allowed to write to the repository), follow
-           <a href="system/sling/login" title="Click to Login">this link</a>.
+           to be allowed to write to the repository) press the login-link on the left.</a>.
         </p>
