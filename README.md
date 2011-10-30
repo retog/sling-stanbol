@@ -1,11 +1,13 @@
-# Sling Stanbol
+# Sling-Stanbol
 
-An Apache Sling launcher comtaining Apache Stanbol and a servlet offering a
-front-end to the Enhancer to the enhancer servlices
+An Apache Sling launcher containing Apache Stanbol and a servlet offering a
+front-end to the Enhancer to the enhancer services
 
 ## Compiling
 
-sling-stanbol is compiled using maven. Currently sevveral dependencies are not yet available in the maven central repository. So you probably need to install the locally fisrt
+Sling-Stanbol is compiled using maven version 3 or higher. You can download maven from <http://maven.apache.org/download.html>.
+
+As several dependencies are not yet available in the maven central repository, we first compile these dependencies locally.
 
 ### Annotate.js
 
@@ -50,6 +52,6 @@ Finally you can compile sling-stanbol by running `mvn install` in the directory 
 - change diretcory to sling-stanbol-launcher/target
 - start the laucher with `java -jar sling-stanbol-launcher-1.0-SNAPSHOT.jar`
 - You may upload html document (using WebDav for example) and open them in the browser, by adding the ".stanbol" suffix to the URI you should see a page that allows enhancing and editing the resource
-- To try the resource page you may go to `http://localhost:8080/turkey.html.stanbol`
+- To try the resource page you may go to `http://localhost:8080/slingstanbol/turkey.html.stanbol`
 - Try out the enhancer servlet at: `http://localhost:8080/stanbol/enhancer`
 
