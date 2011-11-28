@@ -20,12 +20,17 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stax.StAXSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -34,8 +39,6 @@ import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 @Component(immediate=true, metatype=false)
 @Service(Object.class)
@@ -125,8 +128,19 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 		final String content = jcrNode.getProperty("jcr:content/jcr:data").getString();
 		try {
 			//StreamSource inputSource = new StreamSource(new StringReader(content));
-			InputSource inputSource = new InputSource(new StringReader(content));
-			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSource);
+			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+			inputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+
+			StringReader xmlReader = new StringReader(content);
+			XMLEventReader eventReader = inputFactory.createXMLEventReader(xmlReader);
+			StAXSource inputSource = new StAXSource(eventReader);
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			factory.setValidating(false);
+			Document doc = factory.newDocumentBuilder().newDocument();
+			DOMResult result = new DOMResult(doc);
+			transformer.transform(inputSource, result);
+
 			Element docElem = doc.getDocumentElement();
 			DOMSource domSource;
 			if (docElem.getNodeName().equalsIgnoreCase("html")) {
@@ -147,7 +161,7 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 				domSource = new DOMSource(doc);
 			}
 			TransformerFactory tf = TransformerFactory.newInstance();
-			Transformer transformer = tf.newTransformer();
+			//Transformer transformer = tf.newTransformer();
 			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 			transformer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
@@ -156,13 +170,13 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 			StreamResult streamResult = new StreamResult(baos);
 			transformer.transform(domSource, streamResult);
 			return new String(baos.toByteArray(), "utf-8");
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		} catch (TransformerConfigurationException e) {
 			throw new RuntimeException(e);
 		} catch (TransformerException e) {
+			throw new RuntimeException(e);
+		} catch (XMLStreamException e) {
 			throw new RuntimeException(e);
 		}
 	}

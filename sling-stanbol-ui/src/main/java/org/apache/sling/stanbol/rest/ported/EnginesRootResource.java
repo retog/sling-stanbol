@@ -66,7 +66,7 @@ import org.slf4j.LoggerFactory;
 @Service(Object.class)
 @Properties({ @Property(name = "javax.ws.rs", boolValue = true) })
 @SuppressWarnings("serial")
-@Path("/stanbol/engines")
+@Path("/slingstanbol/engines")
 public class EnginesRootResource {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());

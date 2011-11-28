@@ -18,8 +18,6 @@ package org.apache.sling.stanbol.ui;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 import javax.jcr.Node;
 import javax.jcr.PathNotFoundException;
@@ -76,8 +74,6 @@ import org.xml.sax.SAXException;
 @SuppressWarnings("serial")
 public class StanbolResourceViewer {
 
-	@Reference
-	private EnhancementJobManager ejm;
 
 	@Reference
 	private SlingRepository repository;
@@ -120,11 +116,12 @@ public class StanbolResourceViewer {
 			throw new RuntimeException("currently only editing text/html resources is supported");
 		}
 		setContent(jcrNode, content);
-		try {
+		return Response.ok().build();
+		/*try {
 			return Response.seeOther(new URI(Utils.getUri(resource.getPath()).getUnicodeString()+".stanbol")).build();
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
-		}
+		}*/
 	}
 	
 	private void setContent(Node jcrNode, String newContent) throws IOException, RepositoryException {

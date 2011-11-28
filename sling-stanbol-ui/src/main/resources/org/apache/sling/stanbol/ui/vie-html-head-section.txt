@@ -1,4 +1,4 @@
-    <link rel="stylesheet" href="/stanbol/styles/resource-page.css" />
+    <link rel="stylesheet" href="/slingstanbol/styles/resource-page.css" />
     <link rel="stylesheet" href="/apps/annotate.js/Smoothness/jquery.ui.all.css" />
     <link rel="stylesheet" type="text/css" href="/sling.css"/>
     
