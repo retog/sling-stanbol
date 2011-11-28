@@ -112,7 +112,7 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 			out.println("</div>");
 		}
 		out.println("<h2>Pre Stored-Metadata</h2>");
-		out.println("<iframe width=\"90%\" height=\"30%\" src=\""+t.getJcrNode().getPath()+".rdf\">Sorry your browser is too cool for us.</iframe>");
+		out.println("<iframe width=\"90%\" height=\"30%\" src=\""+t.getJcrNode().getPath()+".rdf?xPropSubj=http://fise.iks-project.eu/ontology/extracted-from\">Sorry your browser is too cool for us.</iframe>");
 		{
 			Reader in = new InputStreamReader(getClass().getResourceAsStream("resource-page-body-footer.txt"));
 			for (int ch = in.read(); ch != -1; ch = in.read()) {
