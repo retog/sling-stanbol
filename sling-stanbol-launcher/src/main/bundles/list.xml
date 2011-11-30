@@ -377,12 +377,12 @@
 		<bundle> <!-- used by langid and sling (enforcing newer version-->
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>1.0</version>
+            <version>0.9</version>
         </bundle>
         <bundle>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-bundle</artifactId>
-            <version>1.0</version>
+            <version>0.9</version>
         </bundle>
 		<bundle> <!-- only used by the Factstore -->
 			<groupId>org.apache.derby</groupId>
