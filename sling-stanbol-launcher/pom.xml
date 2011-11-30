@@ -57,6 +57,8 @@
 								<artifactId>org.apache.felix.http.jetty</artifactId>
 								<version>2.2.0</version>
 							</jarWebSupport>
+							<bundleExclusions>
+							</bundleExclusions>
 						</configuration>
 					</execution>
 				</executions>
