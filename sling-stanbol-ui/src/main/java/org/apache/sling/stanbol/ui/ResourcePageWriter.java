@@ -20,9 +20,6 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -30,15 +27,18 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stax.StAXSource;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
+import org.ccil.cowan.tagsoup.Parser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 @Component(immediate=true, metatype=false)
 @Service(Object.class)
@@ -111,7 +111,7 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 			out.println("            <br/><button class=\"saveButton\">Save</button>");
 			out.println("");
 			out.println("        </div>");
-			out.println("        <div id=\"loadingDiv\"><img src=\"/stanbol/spinner.gif\"/></div>");
+			out.println("        <div id=\"loadingDiv\"><img src=\"/slingstanbol/spinner.gif\"/></div>");
 			out.println("</div>");
 		}
 		out.println("<h2>Pre Stored-Metadata</h2>");
@@ -127,14 +127,22 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 	private String getContent(Node jcrNode) throws IOException, RepositoryException {
 		final String content = jcrNode.getProperty("jcr:content/jcr:data").getString();
 		try {
-			//StreamSource inputSource = new StreamSource(new StringReader(content));
-			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-			inputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
-			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			
+			  Parser p = new Parser();
+			  p.setFeature(Parser.namespacesFeature, false);
+			  p.setFeature(Parser.namespacePrefixesFeature, false);
 
-			StringReader xmlReader = new StringReader(content);
-			XMLEventReader eventReader = inputFactory.createXMLEventReader(xmlReader);
-			StAXSource inputSource = new StAXSource(eventReader);
+
+	        p.setFeature(Parser.namespacesFeature, false);
+	        p.setFeature(Parser.namespacePrefixesFeature, false);
+	        /*sax2dom = new SAX2DOM();
+	        p.setContentHandler(sax2dom);*/
+	        //p.parse(new InputSource(new StringReader(content)));
+	        //Document doc = sax2dom.getDOM();
+	        //System.err.println(doc);
+
+	        SAXSource inputSource = new SAXSource(p, new InputSource(new StringReader(content)));
+	        Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			factory.setValidating(false);
 			Document doc = factory.newDocumentBuilder().newDocument();
@@ -160,8 +168,7 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 			} else {
 				domSource = new DOMSource(doc);
 			}
-			TransformerFactory tf = TransformerFactory.newInstance();
-			//Transformer transformer = tf.newTransformer();
+
 			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 			transformer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
@@ -176,7 +183,7 @@ public class ResourcePageWriter implements MessageBodyWriter<ResourcePage> {
 			throw new RuntimeException(e);
 		} catch (TransformerException e) {
 			throw new RuntimeException(e);
-		} catch (XMLStreamException e) {
+		} catch (SAXException e) {
 			throw new RuntimeException(e);
 		}
 	}
