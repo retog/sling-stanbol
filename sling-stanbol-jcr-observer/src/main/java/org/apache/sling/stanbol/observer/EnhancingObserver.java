@@ -42,6 +42,8 @@ import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.sling.jcr.api.SlingRepository;
 import org.apache.sling.stanbol.commons.Utils;
+import org.apache.stanbol.cmsadapter.core.mapping.ContenthubFeederManager;
+import org.apache.stanbol.cmsadapter.servicesapi.mapping.ContenthubFeeder;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EngineException;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementJobManager;
@@ -51,162 +53,139 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /* Observe the jcr repo for changes and generate
-enhancements with Stanbol */
+ enhancements with Stanbol */
 @Component(immediate = true, metatype = false)
-@Properties({
-	@Property(name = "service.description", value = "Listener generating metadata with Stanbol"),
-	@Property(name = "service.vendor", value = "The Apache Software Foundation")
-})
+@Properties({@Property(name = "service.description", value = "Listener generating metadata with Stanbol"),
+             @Property(name = "service.vendor", value = "The Apache Software Foundation")})
 @SuppressWarnings("serial")
 public class EnhancingObserver implements EventListener, Runnable {
 
-	@Reference
-	private SlingRepository repository;
-	
-	@Reference
-	EnhancementJobManager ejm;
-	
-	@Reference
-	Serializer serializer;
-	
-	@Reference
-	TcManager tcManager;
-	
-	@Property(value = "/")
-	private static final String CONTENT_PATH_PROPERTY = "content.path";
-	
-	private static final Logger log = LoggerFactory.getLogger(EnhancingObserver.class);
-	
-	private Session session;
-	
-	private ObservationManager observationManager;
+    @Reference
+    private SlingRepository repository;
 
-	private Set<Node> pendingNodes = new HashSet<Node>();
+    @Reference
+    ContenthubFeederManager contenthubFeederManager;
 
+    @Reference
+    Serializer serializer;
 
-	
-	private Thread thread;
+    @Reference
+    TcManager tcManager;
 
-	protected void activate(ComponentContext context) throws Exception {
-		//supportedMimeTypes.put("image/jpeg", ".jpg");
-		//supportedMimeTypes.put("image/png", ".png");
+    @Property(value = "/")
+    private static final String CONTENT_PATH_PROPERTY = "content.path";
 
-		String contentPath = (String) context.getProperties().get(CONTENT_PATH_PROPERTY);
+    private static final Logger log = LoggerFactory.getLogger(EnhancingObserver.class);
 
-		session = repository.loginAdministrative(null);
-		if (repository.getDescriptor(Repository.OPTION_OBSERVATION_SUPPORTED).equals("true")) {
-			observationManager = session.getWorkspace().getObservationManager();
-			String[] types = {"nt:file", "nt:resource"};
-			observationManager.addEventListener(this,
-					Event.NODE_ADDED | Event.PROPERTY_CHANGED | Event.PROPERTY_ADDED,
-					contentPath, true, null, types, false);
-		} else {
-			log.warn("Obervation is not supported");
-		}
-		thread = new Thread(this);
-		thread.start();
-	}
+    private Session session;
 
-	protected void deactivate(ComponentContext componentContext) throws RepositoryException {
-		if (observationManager != null) {
-			observationManager.removeEventListener(this);
-		}
-		if (session != null) {
-			session.logout();
-			session = null;
-		}
-		thread.interrupt();
-	}
+    private ObservationManager observationManager;
 
-	public void onEvent(EventIterator ei) {
-		while (ei.hasNext()) {
-			Event event = ei.nextEvent();
-			try {
-				if (event.getPath().endsWith("jcr:data")) {
-					String propertyPath = event.getPath();
-					Node addedNode = session.getRootNode().getNode(
-							propertyPath.substring(1, propertyPath.indexOf("/jcr:content")));
-					synchronized(pendingNodes) {
-						pendingNodes.add(addedNode);
-					}
-					synchronized(this) {
-						notifyAll();
-					}
-					
-				}
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			}
-		}
-	}
-	
-	
+    private Set<Node> pendingNodes = new HashSet<Node>();
 
-	public void run() {
-		while (!Thread.currentThread().isInterrupted()) {
-			synchronized(this) {
-				try {
-					wait();
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					thread.interrupt();
-				}
-			}
-			Set<Node> processingNode = new HashSet<Node>();
-			synchronized(pendingNodes) {
-				processingNode.addAll(pendingNodes);
-				pendingNodes.clear();
-			}
-			for (Node node : processingNode) {
-				processNode(node);
-			}
-		}
-	}
+    private ContenthubFeeder feeder;
 
-	private void processNode(Node node) {
-		try {
-			final String content = node.getProperty("jcr:content/jcr:data").getString();
-			String mimeType = getMimeType(node);
-			UriRef contentUri = getUri(node);
-			ContentItem c = new InMemoryContentItem(contentUri.getUnicodeString(), content.getBytes(), mimeType);
-			try {
-				ejm.enhanceContent(c);
-			} catch (EngineException ex) {
-				log.error("Exception enhancing "+node, ex);
-				return;
-			}
-			MGraph metadata = c.getMetadata();
-			MGraph enhancementMGraph = Utils.getEnhancementMGraph(tcManager);
-			GraphNode contentGN = new GraphNode(contentUri, enhancementMGraph);
-			Iterator<GraphNode> enhancementsIter = contentGN.getSubjectNodes(org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_EXTRACTED_FROM);
-			//adding to set to avoid concurrent modification
-			Set<GraphNode> enhancements = new HashSet<GraphNode>();
-			while (enhancementsIter.hasNext()) {
-				GraphNode enhancement = enhancementsIter.next();
-				enhancements.add(enhancement);
-			}
-			for (GraphNode enhancement : enhancements) {
-				enhancement.deleteNodeContext();
-			}
-			contentGN.deleteNodeContext();
-			enhancementMGraph.addAll(metadata);
-			log.info("accumulated metadata size: {}.", enhancementMGraph.size());
-			//serializer.serialize(System.out, metadata, SupportedFormat.RDF_XML);
-		} catch (RepositoryException ex) {
-			throw new RuntimeException(ex);
-		}
-	}
-	
+    private Thread thread;
 
-	private String getMimeType(Node n) throws ValueFormatException, RepositoryException {
-		try {
-			return n.getProperty("jcr:content/jcr:mimeType").getString();
-		} catch (PathNotFoundException ex) {
-			return "application/octet-stream";
-		}
-	}
+    protected void activate(ComponentContext context) throws Exception {
+        // supportedMimeTypes.put("image/jpeg", ".jpg");
+        // supportedMimeTypes.put("image/png", ".png");
 
-	public static UriRef getUri(Node node) throws RepositoryException {
-		return Utils.getUri(node.getPath());
-	}
+        String contentPath = (String) context.getProperties().get(CONTENT_PATH_PROPERTY);
+
+        session = repository.loginAdministrative(null);
+        if (repository.getDescriptor(Repository.OPTION_OBSERVATION_SUPPORTED).equals("true")) {
+            observationManager = session.getWorkspace().getObservationManager();
+            String[] types = {"nt:file", "nt:resource"};
+            observationManager.addEventListener(this, Event.NODE_ADDED | Event.PROPERTY_CHANGED
+                                                      | Event.PROPERTY_ADDED, contentPath, true, null, types,
+                false);
+        } else {
+            log.warn("Obervation is not supported");
+        }
+        feeder = contenthubFeederManager.getContenthubFeeder(session, null);
+        thread = new Thread(this);
+        thread.start();
+    }
+
+    protected void deactivate(ComponentContext componentContext) throws RepositoryException {
+        if (observationManager != null) {
+            observationManager.removeEventListener(this);
+        }
+        if (session != null) {
+            session.logout();
+            session = null;
+        }
+        thread.interrupt();
+    }
+
+    public void onEvent(EventIterator ei) {
+        while (ei.hasNext()) {
+            Event event = ei.nextEvent();
+            try {
+                if (event.getPath().endsWith("jcr:data")) {
+                    String propertyPath = event.getPath();
+                    Node addedNode = session.getRootNode().getNode(
+                        propertyPath.substring(1, propertyPath.indexOf("/jcr:content")));
+                    synchronized (pendingNodes) {
+                        pendingNodes.add(addedNode);
+                    }
+                    synchronized (this) {
+                        notifyAll();
+                    }
+
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+    }
+
+    public void run() {
+        while (!Thread.currentThread().isInterrupted()) {
+            synchronized (this) {
+                try {
+                    wait();
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    thread.interrupt();
+                }
+            }
+            Set<Node> processingNode = new HashSet<Node>();
+            synchronized (pendingNodes) {
+                processingNode.addAll(pendingNodes);
+                pendingNodes.clear();
+            }
+            for (Node node : processingNode) {
+                processNode(node);
+            }
+        }
+    }
+
+    private void processNode(Node node) {
+        try {
+            log.info("Deleting content item hainvg path: {}", node.getPath());
+            feeder.deleteContentItemByPath(node.getPath());
+            log.info("Deleted content item hainvg path: {}", node.getPath());
+            log.info("Creating content item hainvg path: {}", node.getPath());
+            feeder.submitContentItemByCMSObject(node, getUri(node).getUnicodeString());
+            log.info("Created content item hainvg path: {}", node.getPath());
+        } catch (RepositoryException ex) {
+            throw new RuntimeException(ex);
+        } catch (Exception ex) {
+            log.warn("Error while processing node", ex);
+        }
+    }
+
+    private String getMimeType(Node n) throws ValueFormatException, RepositoryException {
+        try {
+            return n.getProperty("jcr:content/jcr:mimeType").getString();
+        } catch (PathNotFoundException ex) {
+            return "application/octet-stream";
+        }
+    }
+
+    public static UriRef getUri(Node node) throws RepositoryException {
+        return Utils.getUri(node.getPath());
+    }
 }
