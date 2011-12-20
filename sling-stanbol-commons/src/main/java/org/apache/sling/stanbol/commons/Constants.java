@@ -20,7 +20,7 @@ import org.apache.clerezza.rdf.core.UriRef;
 
 public class Constants {
 	
-	public static final UriRef enhancementMGraphUri = new UriRef("urn:x-localinstance:/enhancement.graph");
-	//public static final UriRef enhancementMGraphUri = new UriRef("org.apache.stanbol.enhancer.standalone.store.enhancemenets");
+//	public static final UriRef enhancementMGraphUri = new UriRef("urn:x-localinstance:/enhancement.graph");
+	public static final UriRef enhancementMGraphUri = new UriRef("org.apache.stanbol.enhancer.standalone.store.enhancements");
 	
 }

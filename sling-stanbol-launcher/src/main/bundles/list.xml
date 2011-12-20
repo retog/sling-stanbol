@@ -315,7 +315,7 @@
 			<version>0.9.9-SNAPSHOT</version>
 		</bundle>
 	</startLevel>
-	<startLevel level="21">
+	<startLevel level="24">
 		<bundle>
 			<groupId>org.apache.sling</groupId>
 			<artifactId>org.apache.sling.extensions.jaxrs</artifactId>
