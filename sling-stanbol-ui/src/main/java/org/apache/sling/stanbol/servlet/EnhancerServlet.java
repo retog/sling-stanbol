@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
@@ -40,6 +42,7 @@ import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.servlets.SlingSafeMethodsServlet;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EngineException;
+import org.apache.stanbol.enhancer.servicesapi.EnhancementException;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementJobManager;
 import org.apache.stanbol.enhancer.servicesapi.helper.InMemoryContentItem;
 
@@ -79,7 +82,7 @@ public class EnhancerServlet extends SlingSafeMethodsServlet {
 			ContentItem c = new InMemoryContentItem(contentUri.getUnicodeString(), content.getBytes() ,"text/plain");
 			try {
 				ejm.enhanceContent(c);
-			} catch (EngineException ex) {
+			} catch (EnhancementException ex) {
 				throw new ServletException("Exception enhancing content", ex);
 			}
 			MGraph metadata = c.getMetadata();

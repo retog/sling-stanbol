@@ -44,10 +44,7 @@ import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.apache.stanbol.enhancer.servicesapi.ContentItem;
-import org.apache.stanbol.enhancer.servicesapi.EngineException;
-import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
-import org.apache.stanbol.enhancer.servicesapi.EnhancementJobManager;
+import org.apache.stanbol.enhancer.servicesapi.*;
 import org.apache.stanbol.enhancer.servicesapi.helper.InMemoryContentItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -173,7 +170,7 @@ public class EnginesRootResource {
 
 	protected Response enhanceAndBuildResponse(String format,
 			HttpHeaders headers, ContentItem ci, boolean buildAjaxview)
-			throws EngineException, IOException {
+			throws EngineException, IOException, EnhancementException {
 		if (jobManager != null) {
 			jobManager.enhanceContent(ci);
 		}
