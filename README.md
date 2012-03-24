@@ -47,6 +47,12 @@ change to the slingrs directory and compile with maven:
 
 Finally you can compile sling-stanbol by running `mvn install` in the directory where this readme file is located.
 
+## Important note regarding Webdav
+Webdav is broken with the lastest Sling release, so you need to manually downgrade a bundle:
+
+See https://issues.apache.org/jira/browse/SLING-2443, you need to revert
+org.apache.sling.servlets.resolver to 2.1.0 .
+
 ## Launching
 
 - change diretcory to sling-stanbol-launcher/target
