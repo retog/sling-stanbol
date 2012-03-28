@@ -4,7 +4,7 @@
     
     <script src="/system/sling.js"></script>
 
-    <script type="text/javascript" src="/apps/annotate.js/jquery-1.5.1.js"></script>
+    <script type="text/javascript" src="/apps/annotate.js/jquery/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="/apps/annotate.js/jquery-ui.1.9m5.js"></script>
     <script type="text/javascript" src="/apps/annotate.js/underscore-min.js"></script>
     <script type="text/javascript" src="/apps/annotate.js/backbone.js"></script>
