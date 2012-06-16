@@ -3,17 +3,17 @@
 // When the document is ready:
 $().ready(function() {
 
-	require([ "IndexContext" ], function(IndexContext) {
+	/*require([ "IndexContext" ], function(IndexContext) {
 
 		// Create a new IndexContext and initialize it which will create and
 		// start a HelloWorldController
 		var indexContext = new IndexContext();
 		indexContext.initialize();
-	});
+	});*/
 	
-	/*require([ "createjs" ], function(IndexContext) {
+	require([ "createjs" ], function(Create) {
 		//window.alert('f');
 		//console.log('ss');
-	});*/
+	});
 
 });
