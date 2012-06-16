@@ -37,7 +37,7 @@
 			<type>js</type>
 		</dependency> -->
 		<dependency>
-			<groupId>org.apache.stanbol</groupId>
+			<groupId>org.wymiwyg.sling-stanbol</groupId>
 			<artifactId>createjs</artifactId>
 			<version>1.0-SNAPSHOT</version>
 			<type>js</type>
@@ -76,7 +76,7 @@
 	</build>
 
 	<!-- FIXME: Temporary declaration of Codehaus repos until this moves to Maven Central -->
-	<repositories>
+	<!-- <repositories>
 		<repository>
 			<id>snapshots</id>
 			<url>https://nexus.codehaus.org/content/repositories/snapshots/</url>
@@ -97,7 +97,7 @@
 			<snapshots>
 			</snapshots>
 		</pluginRepository>
-	</pluginRepositories>
+	</pluginRepositories> -->
 	<dependencyManagement>
 		<dependencies>
 			<dependency>

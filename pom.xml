@@ -41,6 +41,7 @@
 		<module>sling-stanbol-config</module>
 		<module>sling-stanbol-launcher</module>
 		<module>create-ria</module>
+		<module>createjs</module>
   </modules>
 	<build>	
 		<plugins>
