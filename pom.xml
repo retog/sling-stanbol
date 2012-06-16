@@ -40,7 +40,7 @@
 		<module>sling-stanbol-commons</module>
 		<module>sling-stanbol-config</module>
 		<module>sling-stanbol-launcher</module>
-    <module>create-ria</module>
+		<module>create-ria</module>
   </modules>
 	<build>	
 		<plugins>
