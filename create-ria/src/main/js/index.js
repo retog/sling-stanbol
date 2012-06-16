@@ -10,5 +10,10 @@ $().ready(function() {
 		var indexContext = new IndexContext();
 		indexContext.initialize();
 	});
+	
+	/*require([ "createjs" ], function(IndexContext) {
+		//window.alert('f');
+		//console.log('ss');
+	});*/
 
 });
