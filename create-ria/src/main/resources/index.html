@@ -8,22 +8,7 @@
 		<!-- <script type="text/javascript" src="js/org/wymiwyg/sling-stanbol/createjs/1.0-SNAPSHOT/createjs-1.0-SNAPSHOT.js"></script> -->
 		<!-- <link rel="stylesheet" type="text/css" href="css/index.css" /> -->
 <script>
-      jQuery(document).ready(function () {
-        jQuery('body').midgardCreate({
-          url: function () {
-            return 'javascript:false;';
-          },
-          stanbolUrl: 'http://dev.iks-project.eu:8081',
-          tags: true
-        });
-      });
-      // Fake Backbone.sync since there is no server to communicate with
-      Backbone.sync = function(method, model, options) {
-        if (console && console.log) {
-          console.log('Model contents', model.toJSONLD());
-        }
-        options.success(model);
-      };
+      
     </script>
     <link rel="stylesheet" href="./font-awesome/css/font-awesome.css"
     />
