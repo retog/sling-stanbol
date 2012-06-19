@@ -63,5 +63,5 @@ org.apache.sling.servlets.resolver to 2.1.0 .
 
 ## Further Information
 
-Enhancing documents demo: <http://vimeo.com/31509786>
-Facetted browsing demo: <http://blog.iks-project.eu/sling-stanbol-cms-adapte/>
+- Enhancing documents demo: <http://vimeo.com/31509786>
+- Facetted browsing demo: <http://blog.iks-project.eu/sling-stanbol-cms-adapte/>
