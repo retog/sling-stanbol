@@ -61,3 +61,7 @@ org.apache.sling.servlets.resolver to 2.1.0 .
 - To try the resource page you may go to `http://localhost:8080/slingstanbol/turkey.html.stanbol`
 - Try out the enhancer servlet at: `http://localhost:8080/stanbol/enhancer`
 
+## Further Information
+
+Enhancing documents demo: <http://vimeo.com/31509786>
+Facetted browsing demo: <http://blog.iks-project.eu/sling-stanbol-cms-adapte/>
