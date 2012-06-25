@@ -104,6 +104,26 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>                   
                     <execution>
+                        <id>copy-www-deps</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+							<!-- <useSubDirectoryPerArtifact>true</useSubDirectoryPerArtifact> -->
+							<destFileName>optional-new-name.jar</destFileName>
+							<useSubDirectoryPerArtifact>false</useSubDirectoryPerArtifact>
+							<stripVersion>false</stripVersion>
+                            <includeTypes>zip</includeTypes>
+                            <outputDirectory>${project.build.directory}/maven-shared-archive-resources/initial-content/apps/</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+			<!-- <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>                   
+                    <execution>
                         <id>copy-js-deps</id>
                         <phase>generate-sources</phase>
                         <goals>
@@ -116,7 +136,7 @@
                     </execution>
                    
                 </executions>
-            </plugin>
+            </plugin> -->
 		</plugins>
 	</build>
 
@@ -126,7 +146,8 @@
 	        <groupId>org.wymiwyg.sling-stanbol</groupId>
 			<artifactId>create-ria</artifactId>
 			<version>0.1-SNAPSHOT</version>
-			<type>js</type>
+			<classifier>www</classifier>
+			<type>zip</type>
 	    </dependency>
 		<dependency>
 		    <groupId>org.ccil.cowan.tagsoup</groupId>

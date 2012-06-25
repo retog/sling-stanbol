@@ -21,15 +21,22 @@ change to the annotate.js/lib directory and install with maven
 
 ### Stanbol
 
-clone the repo:
-`git clone https://github.com/apache/stanbol.git`
+Sling-Stanbol is based on the latest released version of Apache Stanbol. Unfortunately not all of Stanbol is in maven central.
 
-change to the stanbol directory and install with maven
+You need to manually install the Stanbol third party dependencies as this is described in:
 
-    cd stanbol
+https://svn.apache.org/repos/asf/incubator/stanbol/tags/0.9.0-incubating/README.md
+
+Once you have installed the thrird party dependencies you can compile the Stanbol.
+
+check out Stnabol data
+`svn co https://svn.apache.org/repos/asf/incubator/stanbol/tags/0.9.0-incubating/data stanbol-data
+
+
+change to the stanbol-data directory and install with maven
+
+    cd stanbol-data
     mvn install -Dmaven.test.skip=true
-
-For some yet unclear reasons, you might have to run the last command again if the build fails.
 
 ### JAX-RS support for sling
 

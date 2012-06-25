@@ -1,0 +1,13 @@
+<assembly>
+	<id>www</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<baseDirectory>/create-ria</baseDirectory>
+	<fileSets>
+		<fileSet>
+			<directory>${basedir}/target/classes</directory>
+			<outputDirectory>/</outputDirectory>
+		</fileSet>
+	</fileSets>
+</assembly>
