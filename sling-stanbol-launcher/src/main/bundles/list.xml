@@ -67,6 +67,8 @@
 			<version>1.0-SNAPSHOT</version>
 		</bundle>
 	</startLevel>
+	
+
 		
 <!--  copied from full launcher (why isn't this stuff in a partial bundlelist? -->
 <!-- *********************************************************************

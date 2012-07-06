@@ -21,14 +21,21 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.apache.stanbol</groupId>
+	
+	<!--<parent>	 <groupId>org.apache.stanbol</groupId>
     <artifactId>stanbol-parent</artifactId>
-    <version>0.9.0-incubating</version>
-		<!-- <groupId>org.wymiwyg.sling-stanbol</groupId>
+    <version>0.9.0-incubating</version> </parent>-->
+	<parent>
+		 <groupId>org.wymiwyg.sling-stanbol</groupId>
 		<artifactId>sling-stanbol</artifactId>
-		<version>1.0-SNAPSHOT</version> -->
+		<version>1.0-SNAPSHOT</version>
 	</parent>
+	<!-- <parent>
+        <groupId>org.apache.sling</groupId>
+        <artifactId>sling</artifactId>
+        <version>13-SNAPSHOT</version>
+        <relativePath>../../parent/pom.xml</relativePath>
+    </parent> -->
 	<groupId>org.wymiwyg.sling-stanbol</groupId>
 	<artifactId>sling-stanbol-launcher</artifactId>
 	<packaging>jar</packaging>
@@ -43,71 +50,100 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.sling</groupId>
-				<artifactId>maven-launchpad-plugin</artifactId>
-				<version>2.1.0</version>
-				<executions>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>maven-launchpad-plugin</artifactId>
+                <!-- <version>2.1.1-SNAPSHOT</version> -->
+                 <executions>
+                    <execution>
+                        <id>prepare-package</id>
+                        <goals>
+                            <goal>prepare-package</goal>
+                        </goals>
+                    </execution>
 					<execution>
-						<id>prepare-package</id>
-						<goals>
-							<goal>prepare-package</goal>
-						</goals>
-						<configuration>
-							<includeDefaultBundles>true</includeDefaultBundles>
-							<jarWebSupport>
-								<groupId>org.apache.felix</groupId>
-								<artifactId>org.apache.felix.http.jetty</artifactId>
-								<version>2.2.0</version>
-							</jarWebSupport>
-							<defaultBundleList>
-								<groupId>org.apache.sling</groupId>
-								<artifactId>org.apache.sling.launchpad</artifactId>
-								<version>7-SNAPSHOT</version>
-							</defaultBundleList>
-							<bundleExclusions>
-							</bundleExclusions>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+                        <id>prepare-package-jar</id>
+                        <goals>
+                            <goal>prepare-package</goal>
+                        </goals>
+                        <configuration>
+                            <packaging>jar</packaging>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>attach-bundle-list</id>
+                        <goals>
+                            <goal>attach-bundle-list</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <defaultBundleList>
+                        <!-- only need this until the next release -->
+                        <version>7-SNAPSHOT</version>
+                    </defaultBundleList>
+                    <additionalBundles>
+                        <bundle>
+                            <groupId>org.apache.felix</groupId>
+                            <artifactId>org.apache.felix.shell</artifactId>
+                            <version>1.4.2</version>
+                            <startLevel>20</startLevel>
+                        </bundle>
+                    </additionalBundles>
+					<rewriteRuleFiles>
+                                <rewriteRuleFile>
+                                    ${basedir}/src/main/rules/reactor.drl
+                                </rewriteRuleFile>
+                     </rewriteRuleFiles>
+                </configuration>
+            </plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
 				<configuration>
 					<archive>
-						<manifest>
-							<!-- make the generated jar runnable -->
-							<addClasspath>true</addClasspath>
-							<mainClass>org.apache.sling.launchpad.app.Main</mainClass>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-						</manifest>
+							<manifest>
+								<mainClass>org.apache.sling.launchpad.app.Main</mainClass>
+							</manifest>
 					</archive>
+
 				</configuration>
-			</plugin>
+                <executions>
+                    <execution>
+                    <!--    <id>create-standalone-jar</id> -->
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+
+						
+
+                    </execution>
+                </executions>
+            </plugin>
+            
 			
 		</plugins>
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.sling</groupId>
-			<artifactId>org.apache.sling.launchpad.base</artifactId>
-			<classifier>app</classifier>
-			<version>2.4.0</version>
-		</dependency>
-		
-	<!-- Stanbol Commons Bundle List -->
+            <groupId>org.apache.sling</groupId>
+            <artifactId>org.apache.sling.launchpad.base</artifactId>
+            <version>2.4.1-SNAPSHOT</version>
+            <classifier>app</classifier>
+            <scope>provided</scope>
+        </dependency>
+       <!-- The test services bundles -->
+<!--        <dependency>
+             <groupId>org.apache.sling</groupId>
+             <artifactId>org.apache.sling.launchpad.test-bundles</artifactId>
+             <version>0.0.1-SNAPSHOT</version>
+             <type>partialbundlelist</type>
+      <scope>provided</scope>
+    </dependency> -->
+
+ <!-- Stanbol Commons Bundle List -->
     <dependency>
       <groupId>org.apache.stanbol</groupId>
       <artifactId>org.apache.stanbol.launchers.bundlelists.stanbolcommons</artifactId>
-      <type>partialbundlelist</type>
-      <scope>provided</scope>
-    </dependency>
-    
-     <!-- Stanbol CMS Adapter Bundle List -->
-    <dependency>
-      <groupId>org.apache.stanbol</groupId>
-      <artifactId>org.apache.stanbol.cmsadapter.bundlelist</artifactId>
       <type>partialbundlelist</type>
       <scope>provided</scope>
     </dependency>
@@ -119,6 +155,14 @@
       <type>partialbundlelist</type>
       <scope>provided</scope>
     </dependency>
+	
+	<!-- Stanbol CMS Adapter Bundle List -->
+    <dependency>
+      <groupId>org.apache.stanbol</groupId>
+      <artifactId>org.apache.stanbol.cmsadapter.bundlelist</artifactId>
+      <type>partialbundlelist</type>
+      <scope>provided</scope>
+    </dependency>
 
     <!-- Stanbol Data Bundle List -->
     <dependency>
@@ -127,7 +171,7 @@
       <type>partialbundlelist</type>
       <scope>provided</scope>
     </dependency>
-    <dependency> <!-- include all OpenNLP models in the full launcher -->
+    <dependency> <!--   include all OpenNLP models in the full launcher -->
       <groupId>org.apache.stanbol</groupId>
       <artifactId>org.apache.stanbol.data.bundlelists.opennlp</artifactId>
       <type>partialbundlelist</type>
@@ -146,6 +190,30 @@
     <dependency>
       <groupId>org.apache.stanbol</groupId>
       <artifactId>org.apache.stanbol.entityhub.bundlelist</artifactId>
+      <type>partialbundlelist</type>
+      <scope>provided</scope>
+    </dependency>
+	
+	<!-- Stanbol Ontology Manager Bundle List -->
+    <dependency>
+      <groupId>org.apache.stanbol</groupId>
+      <artifactId>org.apache.stanbol.ontologymanager.bundlelist</artifactId>
+      <type>partialbundlelist</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Stanbol Rules Bundle List -->
+    <dependency>
+      <groupId>org.apache.stanbol</groupId>
+      <artifactId>org.apache.stanbol.rules.bundlelist</artifactId>
+      <type>partialbundlelist</type>
+      <scope>provided</scope>
+    </dependency>
+    
+    <!-- Stanbol Reasoners Bundle List -->
+    <dependency>
+      <groupId>org.apache.stanbol</groupId>
+      <artifactId>org.apache.stanbol.reasoners.bundlelist</artifactId>
       <type>partialbundlelist</type>
       <scope>provided</scope>
     </dependency>
