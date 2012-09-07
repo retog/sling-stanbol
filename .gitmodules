@@ -1,3 +1,12 @@
 [submodule "create-ria/submodules/create"]
 	path = create-ria/submodules/create
 	url = https://github.com/bergie/create.git
+[submodule "stanbol"]
+	path = stanbol
+	url = git://git.apache.org/stanbol.git
+[submodule "slingrs"]
+	path = slingrs
+	url = git://github.com/retobg/slingrs.git
+[submodule "annotate.js"]
+	path = annotate.js
+	url = git://github.com/IKS/annotate.js.git
