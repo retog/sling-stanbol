@@ -46,11 +46,12 @@
 			<artifactId>sling-stanbol-index-page</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</bundle>
+		<!--  config now in src/main/config
 		<bundle>
 			<groupId>org.wymiwyg.sling-stanbol</groupId>
 			<artifactId>sling-stanbol-config</artifactId>
 			<version>1.0-SNAPSHOT</version>
-		</bundle>
+		</bundle> -->
 		<bundle>
 			<groupId>org.wymiwyg.sling-stanbol</groupId>
 			<artifactId>sling-stanbol-jcr-observer</artifactId>
