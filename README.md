@@ -10,6 +10,11 @@ Sling-Stanbol is compiled using maven version 3 or higher. You can download mave
 As some of he dependecies are not (yet) available in maven central repository their 
 source is included as git submodules. They are built with the top level maven build.
 
+make sure you have the submodules installed with
+
+git submodule init
+git submodule update
+
 You can compile sling-stanbol by running `mvn install` in the directory where this readme file is located.
 
 ## Important note regarding Webdav
