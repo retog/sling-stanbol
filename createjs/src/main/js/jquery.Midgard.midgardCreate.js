@@ -38,6 +38,8 @@
       },
       // Additional editor options.
       editorOptions: {},
+      enableEditor: null,
+      disableEditor: null,
       url: function () {},
       storagePrefix: 'node',
       workflows: {
@@ -45,9 +47,7 @@
       },
       notifications: {},
       vie: null,
-      stanbolUrl: null,
-      dbPediaUrl: null,
-      tags: false
+      stanbolUrl: null
     },
 
     _create: function () {
@@ -64,19 +64,15 @@
             url: this.options.stanbolUrl
           }));
         }
-
-        if (this.options.dbPediaUrl) {
-          this.vie.use(new this.vie.DBPediaService({
-            proxyDisabled: true,
-            url: this.options.dbPediaUrl
-          }));
-        }
       }
       this._checkSession();
       this._enableToolbar();
       this._saveButton();
       this._editButton();
-      this._prepareStorage();
+      this.element.midgardStorage({
+        vie: this.vie,
+        url: this.options.url
+      });
 
       if (this.element.midgardWorkflows) {
         this.element.midgardWorkflows(this.options.workflows);
@@ -85,21 +81,6 @@
       if (this.element.midgardNotifications) {
         this.element.midgardNotifications(this.options.notifications);
       }
-    },
-
-    _prepareStorage: function () {
-      this.element.midgardStorage({
-        vie: this.vie,
-        url: this.options.url
-      });
-
-      this.element.bind('midgardstoragesave', function () {
-        jQuery('#midgardcreate-save a').html('Saving <i class="icon-upload"></i>');
-      });
-
-      this.element.bind('midgardstoragesaved', function () {
-        jQuery('#midgardcreate-save a').html('Save <i class="icon-ok"></i>');
-      });
     },
 
     _init: function () {
@@ -225,19 +206,8 @@
           jQuery(this).unbind('midgardeditableenableproperty', highlightEditable);
         });
 
-        if (widget.options.tags) {
-          jQuery(this).bind('midgardeditableenable', function (event, options) {
-            jQuery(this).midgardTags({
-              vie: widget.vie,
-              entityElement: options.entityElement,
-              entity: options.instance
-            });
-          });
-        }
-
         jQuery(this).midgardEditable(editableOptions);
       });
-
       this._trigger('statechange', null, {
         state: 'edit'
       });
@@ -248,11 +218,17 @@
       var editableOptions = {
         disabled: true,
         vie: widget.vie,
+        editor: widget.options.editor,
         editorOptions: widget.options.editorOptions
       };
+      if (widget.options.enableEditor) {
+        editableOptions[enableEditor] = widget.options.enableEditor;
+      }
+      if (widget.options.disableEditor) {
+        editableOptions[disableEditor] = widget.options.disableEditor;
+      }
       jQuery('[about]', this.element).each(function () {
-        jQuery(this).midgardEditable(editableOptions);
-        jQuery(this).removeClass('ui-state-disabled');
+        jQuery(this).midgardEditable(editableOptions).removeClass('ui-state-disabled');
       });
       this._setOption('state', 'browse');
       this._trigger('statechange', null, {

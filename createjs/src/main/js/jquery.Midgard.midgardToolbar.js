@@ -33,7 +33,6 @@
       jQuery(this.element).bind('midgardcreatestatechange', function (event, options) {
         if (options.state == 'browse') {
           widget._clearWorkflows();
-          widget._clearMetadata();
         }
       });
 
@@ -79,15 +78,11 @@
     },
 
     _getFull: function () {
-      return jQuery('<div class="create-ui-toolbar-wrapper"><div class="create-ui-toolbar-toolarea"><div class="create-ui-toolbar-dynamictoolarea"><ul class="create-ui-dynamictools create-ui-toolset-1"><li class="create-ui-tool-metadataarea"></li><li class="create-ui-tool-workflowarea"></li><li class="create-ui-tool-freearea"></li></ul></div><div class="create-ui-toolbar-statustoolarea"><ul class="create-ui-statustools"></ul></div></div></div>');
+      return jQuery('<div class="create-ui-toolbar-wrapper"><div class="create-ui-toolbar-toolarea"><div class="create-ui-toolbar-dynamictoolarea"><ul class="create-ui-dynamictools create-ui-toolset-1"><li class="create-ui-tool-workflowarea"></li><li class="create-ui-tool-freearea"></li></ul></div><div class="create-ui-toolbar-statustoolarea"><ul class="create-ui-statustools"></ul></div></div></div>');
     },
 
     _clearWorkflows: function () {
       jQuery('.create-ui-tool-workflowarea', this.element).empty();
-    },
-
-    _clearMetadata: function () {
-      jQuery('.create-ui-tool-metadataarea', this.element).empty();
     }
   });
 })(jQuery);

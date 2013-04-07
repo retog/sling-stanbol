@@ -8,20 +8,58 @@
   jQuery.widget('Midgard.midgardEditable', {
     options: {
       editables: [],
-      collections: [],
       model: null,
       editorOptions: {},
       // the available widgets by data type
+      // TODO: needs a comprehensive list of types and their appropriate widgets
       widgets: {
         'Text': 'halloWidget',
         'default': 'halloWidget'
       },
-      collectionWidgets: {
-        'default': 'midgardCollectionAdd'
-      },
       toolbarState: 'full',
+      // returns the name of the widget to use for the given property
+      widgetName: function (data) {
+        // TODO: make sure type is already loaded into VIE
+        var propertyType = 'default';
+        var type = this.model.get('@type');
+        if (type) {
+          if (type.attributes && type.attributes.get(data.property)) {
+            propertyType = type.attributes.get(data.property).range[0];
+          }
+        }
+        if (this.widgets[propertyType]) {
+          return this.widgets[propertyType];
+        }
+        return this.widgets['default'];
+      },
+      enableEditor: function (data) {
+        var widgetName = this.widgetName(data);
+        data.disabled = false;
+        if (typeof jQuery(data.element)[widgetName] !== 'function') {
+          throw new Error(widgetName + ' widget is not available');
+        }
+        jQuery(data.element)[widgetName](data);
+        jQuery(data.element).data('createWidgetName', widgetName);
+        return jQuery(data.element);
+      },
+      disableEditor: function (data) {
+        var widgetName = jQuery(data.element).data('createWidgetName');
+        data.disabled = true;
+        if (widgetName) {
+          // only if there has been an editing widget registered
+          jQuery(data.element)[widgetName](data);
+          jQuery(data.element).removeClass('ui-state-disabled');
+        }
+      },
+      addButton: null,
+      enable: function () {},
+      enableproperty: function () {},
+      disable: function () {},
+      activated: function () {},
+      deactivated: function () {},
+      changed: function () {},
       vie: null,
-      disabled: false
+      enableCollectionAdd: true
     },
 
     _create: function () {
@@ -54,18 +92,12 @@
         instance: this.options.model,
         entityElement: this.element
       });
-
+      if (!this.options.enableCollectionAdd) {
+        return;
+      }
       _.forEach(this.vie.service('rdfa').views, function (view) {
-        if (view instanceof widget.vie.view.Collection && widget.options.model === view.owner) {
-          var collection = widget.enableCollection({
-            model: widget.options.model,
-            collection: view.collection,
-            view: view,
-            element: view.el,
-            vie: widget.vie,
-            editableOptions: widget.options
-          });
-          widget.options.collections.push(collection);
+        if (view instanceof widget.vie.view.Collection) {
+          widget._enableCollection(view);
         }
       });
     },
@@ -73,7 +105,7 @@
     disable: function () {
       var widget = this;
       jQuery.each(this.options.editables, function (index, editable) {
-        widget.disableEditor({
+        widget.options.disableEditor({
           widget: widget,
           editable: editable,
           entity: widget.options.model,
@@ -81,16 +113,11 @@
         });
       });
       this.options.editables = [];
-      jQuery.each(this.options.collections, function (index, collectionWidget) {
-        widget.disableCollection({
-          widget: widget,
-          model: widget.options.model,
-          element: collectionWidget,
-          vie: widget.vie,
-          editableOptions: widget.options
-        });
-      });
-      this.options.collections = [];
+
+      if (this.options.addButton) {
+        this.options.addButton.remove();
+        delete this.options.addButton;
+      }
 
       this._trigger('disable', null, {
         instance: this.options.model,
@@ -109,7 +136,7 @@
         return true;
       }
 
-      var editable = this.enableEditor({
+      var editable = this.options.enableEditor({
         widget: this,
         element: element,
         entity: this.options.model,
@@ -159,74 +186,51 @@
       this.options.editables.push(editable);
     },
 
-    // returns the name of the widget to use for the given property
-    _widgetName: function (data) {
-      if (this.options.widgets[data.property]) {
-        // Widget configuration set for specific RDF predicate
-        return this.options.widgets[data.property];
+    _enableCollection: function (collectionView) {
+      var widget = this;
+
+      if (!collectionView.owner || collectionView.owner.getSubject() !== widget.options.model.getSubject()) {
+        return;
       }
 
-      // Load the widget configuration for the data type
-      // TODO: make sure type is already loaded into VIE
-      var propertyType = 'default';
-      var type = this.options.model.get('@type');
-      if (type) {
-        if (type.attributes && type.attributes.get(data.property)) {
-          propertyType = type.attributes.get(data.property).range[0];
-        }
+      if (widget.options.addButton) {
+        return;
       }
-      if (this.options.widgets[propertyType]) {
-        return this.options.widgets[propertyType];
-      }
-      return this.options.widgets['default'];
-    },
 
-    enableEditor: function (data) {
-      var widgetName = this._widgetName(data);
-      data.disabled = false;
-      if (typeof jQuery(data.element)[widgetName] !== 'function') {
-        throw new Error(widgetName + ' widget is not available');
+      if (collectionView.template.length === 0) {
+        // Collection view has no template and so can't add
+        return;
       }
-      jQuery(data.element)[widgetName](data);
-      jQuery(data.element).data('createWidgetName', widgetName);
-      return jQuery(data.element);
-    },
 
-    disableEditor: function (data) {
-      return;
-      var widgetName = jQuery(data.element).data('createWidgetName');
-      data.disabled = true;
-      if (widgetName) {
-        // only if there has been an editing widget registered
-        jQuery(data.element)[widgetName](data);
-        jQuery(data.element).removeClass('ui-state-disabled');
-      }
-    },
+      collectionView.collection.url = widget.options.model.url();
 
-    collectionWidgetName: function (data) {
-      // TODO: Actual selection mechanism
-      return this.options.collectionWidgets['default'];
-    },
+      collectionView.bind('add', function (itemView) {
+        //itemView.el.effect('slide');
+        jQuery(itemView.el).midgardEditable({
+          disabled: widget.options.disabled,
+          model: itemView.model,
+          vie: widget.vie,
+          widgets: widget.options.widgets
+        });
+      });
 
-    enableCollection: function (data) {
-      var widgetName = this.collectionWidgetName(data);
-      data.disabled = false;
-      if (typeof jQuery(data.element)[widgetName] !== 'function') {
-        throw new Error(widgetName + ' widget is not available');
-      }
-      jQuery(data.element)[widgetName](data);
-      jQuery(data.element).data('createCollectionWidgetName', widgetName);
-      return jQuery(data.element);
-    },
+      collectionView.collection.bind('add', function (model) {
+        model.primaryCollection = collectionView.collection;
+        widget.vie.entities.add(model);
+        model.collection = collectionView.collection;
+      });
 
-    disableCollection: function (data) {
-      var widgetName = jQuery(data.element).data('createCollectionWidgetName');
-      data.disabled = true;
-      if (widgetName) {
-        // only if there has been an editing widget registered
-        jQuery(data.element)[widgetName](data);
-        jQuery(data.element).removeClass('ui-state-disabled');
-      }
+      collectionView.bind('remove', function (itemView) {
+        //itemView.el.hide('drop');
+      });
+
+      widget.options.addButton = jQuery('<button class="btn"><i class="icon-plus"></i> Add</button>').button();
+      widget.options.addButton.addClass('midgard-create-add');
+      widget.options.addButton.click(function () {
+        collectionView.collection.add({});
+      });
+
+      jQuery(collectionView.el).after(widget.options.addButton);
     }
   });
 })(jQuery);

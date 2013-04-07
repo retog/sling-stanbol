@@ -12,8 +12,7 @@
     options: {
       disabled: true,
       toolbarState: 'full',
-      vie: null,
-      entity: null
+      vie: null
     },
     enable: function () {
       jQuery(this.element).hallo({
@@ -57,20 +56,14 @@
           halloformat: {},
           halloblock: {},
           hallolists: {},
-          hallolink: {},
-          halloimage: {
-            entity: this.options.entity
-          },
-          halloindicator: {}
         },
         buttonCssClass: 'create-ui-btn-small',
         placeholder: '[' + this.options.property + ']'
       };
-
       if (typeof this.element.annotate === 'function' && this.options.vie.services.stanbol) {
         // Enable Hallo Annotate plugin by default if user has annotate.js
         // loaded and VIE has Stanbol enabled
-        defaults.plugins.halloannotate = {
+        defaults.plugins['halloannotate'] = {
             vie: this.options.vie
         };
       }

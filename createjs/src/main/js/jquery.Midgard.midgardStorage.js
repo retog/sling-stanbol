@@ -5,23 +5,12 @@
 //     http://createjs.org/
 (function (jQuery, undefined) {
   jQuery.widget('Midgard.midgardStorage', {
-    changedModels: [],
-    saveEnabled: true,
     options: {
-      // Whether to use localstorage
       localStorage: false,
-      // VIE instance to use for storage handling
       vie: null,
-      // URL callback for Backbone.sync
-      url: '',
-      // Whether to enable automatic saving
-      autoSave: false,
-      // How often to autosave in milliseconds
-      autoSaveInterval: 5000,
-      // Whether to save entities that are referenced by entities
-      // we're saving to the server.
-      saveReferencedNew: false,
-      saveReferencedChanged: false
+      changedModels: [],
+      loaded: function () {},
+      url: ''
     },
 
     _create: function () {
@@ -51,67 +40,14 @@
       });
 
       widget._bindEditables();
-      if (widget.options.autoSave) {
-        widget._autoSave();
-      }
-    },
-
-    _autoSave: function () {
-      var widget = this;
-      widget.saveEnabled = true;
-
-      var doAutoSave = function () {
-        if (!widget.saveEnabled) {
-          return;
-        }
-
-        if (widget.changedModels.length === 0) {
-          return;
-        }
-
-        widget._saveRemote({
-          success: function () {
-            jQuery('#midgardcreate-save').button({
-              disabled: true
-            });
-          },
-          error: function () {}
-        });
-      };
-
-      var timeout = window.setInterval(doAutoSave, widget.options.autoSaveInterval);
-
-      this.element.bind('startPreventSave', function () {
-        if (timeout) {
-          window.clearInterval(timeout);
-          timeout = null;
-        }
-        widget.disableSave();
-      });
-      this.element.bind('stopPreventSave', function () {
-        if (!timeout) {
-          timeout = window.setInterval(doAutoSave, widget.options.autoSaveInterval);
-        }
-        widget.enableSave();
-      });
-
-    },
-
-    enableSave: function () {
-      this.saveEnabled = true;
-    },
-
-    disableSave: function () {
-      this.saveEnabled = false;
     },
 
     _bindEditables: function () {
       var widget = this;
-      var restorables = [];
 
       widget.element.bind('midgardeditablechanged', function (event, options) {
-        if (_.indexOf(widget.changedModels, options.instance) === -1) {
-          widget.changedModels.push(options.instance);
+        if (_.indexOf(widget.options.changedModels, options.instance) === -1) {
+          widget.options.changedModels.push(options.instance);
         }
         widget._saveLocal(options.instance);
         jQuery('#midgardcreate-save').button({disabled: false});
@@ -125,57 +61,19 @@
       widget.element.bind('midgardeditableenable', function (event, options) {
         jQuery('#midgardcreate-save').button({disabled: true});
         jQuery('#midgardcreate-save').show();
-        if (!options.instance.isNew() && widget._checkLocal(options.instance)) {
-          // We have locally-stored modifications, user needs to be asked
-          restorables.push(options.instance);
+        if (!options.instance.isNew()) {
+          widget._readLocal(options.instance);
         }
-
-        /*_.each(options.instance.attributes, function (attributeValue, property) {
+        _.each(options.instance.attributes, function (attributeValue, property) {
           if (attributeValue instanceof widget.vie.Collection) {
-            widget._readLocalReferences(options.instance, property, attributeValue);
+            //widget._readLocalReferences(options.instance, property, attributeValue);
           }
-        });*/
-      });
-
-      widget.element.bind('midgardcreatestatechange', function (event, options) {
-        if (options.state === 'browse' || restorables.length === 0) {
-          return;
-        }
-        
-        jQuery('body').data('midgardCreate').showNotification({
-          bindTo: '#midgardcreate-edit a',
-          gravity: 'TR',
-          body: restorables.length + " items on this page have local modifications",
-          timeout: 0,
-          actions: [
-            {
-              name: 'restore',
-              label: 'Restore',
-              cb: function() {
-                _.each(restorables, function(instance) {
-                  widget._readLocal(instance);
-                });
-                restorables = [];
-              },
-              className: 'create-ui-btn'
-            },
-            {
-              name: 'ignore',
-              label: 'Ignore',
-              cb: function(event, notification) {
-                // TODO: Clear from localStorage?
-                notification.close();
-                restorables = [];
-              },
-              className: 'create-ui-btn'
-            }
-          ]
         });
       });
 
       widget.element.bind('midgardstorageloaded', function (event, options) {
-        if (_.indexOf(widget.changedModels, options.instance) === -1) {
-          widget.changedModels.push(options.instance);
+        if (_.indexOf(widget.options.changedModels, options.instance) === -1) {
+          widget.options.changedModels.push(options.instance);
         }
         jQuery('#midgardcreate-save').button({
           disabled: false
@@ -186,42 +84,17 @@
     _saveRemote: function (options) {
       var widget = this;
       widget._trigger('save', null, {
-        models: widget.changedModels
+        models: widget.options.changedModels
       });
-
-      var needed = widget.changedModels.length;
+      var needed = widget.options.changedModels.length;
       if (needed > 1) {
         notification_msg = needed + ' objects saved successfully';
       } else {
-        subject = widget.changedModels[0].getSubjectUri();
+        subject = widget.options.changedModels[0].getSubjectUri();
         notification_msg = 'Object with subject ' + subject + ' saved successfully';
       }
 
-      widget.disableSave();
-      _.forEach(widget.changedModels, function (model, index) {
-
-        // Optionally handle entities referenced in this model first
-        _.each(model.attributes, function (value, property) {
-          if (!value.isCollection) {
-            return;
-          }
-
-          value.each(function (referencedModel) {
-            if (widget.changedModels.indexOf(referencedModel) !== -1) {
-              // The referenced model is already in the save queue
-              return;
-            }
-
-            if (referencedModel.isNew() && widget.options.saveReferencedNew) {
-              return referencedModel.save();
-            }
-
-            if (referencedModel.hasChanged() && widget.options.saveReferencedChanged) {
-              return referencedModel.save();
-            }
-          });
-        });
-
+      _.forEach(widget.options.changedModels, function (model, index) {
         model.save(null, {
           success: function () {
             if (model.originalAttributes) {
@@ -229,7 +102,7 @@
               delete model.originalAttributes;
             }
             widget._removeLocal(model);
-            widget.changedModels.splice(index, 1);
+            widget.options.changedModels.splice(index, 1);
             needed--;
             if (needed <= 0) {
               // All models were happily saved
@@ -238,7 +111,6 @@
               jQuery('body').data('midgardCreate').showNotification({
                 body: notification_msg
               });
-              widget.enableSave();
             }
           },
           error: function (m, err) {
@@ -301,19 +173,6 @@
       localStorage.setItem(identifier, JSON.stringify([json]));
     },
 
-    _checkLocal: function (model) {
-      if (!this.options.localStorage) {
-        return false;
-      }
-
-      var local = localStorage.getItem(model.getSubjectUri());
-      if (!local) {
-        return false;
-      }
-
-      return true;
-    },
-
     _readLocal: function (model) {
       if (!this.options.localStorage) {
         return;
@@ -351,7 +210,6 @@
 
     _restoreLocal: function (model) {
       var widget = this;
-
       // Remove unsaved collection members
       if (!model) { return; }
       _.each(model.attributes, function (attributeValue, property) {
@@ -372,7 +230,6 @@
         }
         return;
       }
-
       model.set(model.previousAttributes());
     },
 
